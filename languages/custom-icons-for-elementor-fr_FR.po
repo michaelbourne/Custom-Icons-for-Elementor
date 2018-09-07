@@ -1,0 +1,119 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Elementor Custom Icons\n"
+"POT-Creation-Date: 2018-08-04 10:31+0200\n"
+"PO-Revision-Date: 2018-08-04 11:11+0200\n"
+"Last-Translator: FreePixel <contact@freepixel.net>\n"
+"Language-Team: FreePixel\n"
+"Language: fr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 2.1.1\n"
+"X-Poedit-Basepath: custom-icons-for-elementor\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Poedit-KeywordsList: esc_html_e;__;_e\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"X-Poedit-SearchPath-0: elementor-custom-icons.php\n"
+"X-Poedit-SearchPath-1: includes/merge.css.php\n"
+"X-Poedit-SearchPath-2: includes/save.font.php\n"
+"X-Poedit-SearchPath-3: includes/template.options.page.php\n"
+
+#: elementor-custom-icons.php:174
+msgid "Custom Icons for Elementor"
+msgstr "Custom Icons for Elementor"
+
+#: elementor-custom-icons.php:175
+msgid "Custom Icons"
+msgstr "Icônes personnalisées"
+
+#: includes/template.options.page.php:23
+msgid "Elementor Custom Icons"
+msgstr "Icônes personnalisées Elementor"
+
+#: includes/template.options.page.php:34
+msgid "Create a new Icon Font"
+msgstr "Créer une nouvelle police d'icônes"
+
+#: includes/template.options.page.php:40
+#, php-format
+msgid ""
+"Visit <a href=\"%s\" target=\"_blank\">Fontello</a> and select the icons you "
+"would like to use. You can even upload custom SVG icons of your own, whether "
+"they be custom made or from a source like <a href=\"%s\" target=\"_blank"
+"\">Flaticon!</a>"
+msgstr ""
+"Visitez <a href=\"%s\" target=\"_blank\">Fontello</a> et sélectionnez les "
+"icônes que vous souhaitez utiliser. Vous pouvez même télécharger des icônes "
+"SVG personnalisées, qu’elles soient personnalisées ou à partir d’une source "
+"telle que <a href=\"%s\" target=\"_blank\">Flaticon!</a>"
+
+#: includes/template.options.page.php:63
+msgid "Upload your ZIP file here"
+msgstr "Télécharger votre fichier ZIP ici"
+
+#. translators: Options page step 2.
+#: includes/template.options.page.php:67
+msgid ""
+"After selecting your icons, give your font a unique name and hit download. "
+"Then, upload that ZIP file here."
+msgstr ""
+"Après avoir sélectionné vos icônes, donnez à votre police un nom unique et "
+"cliquez sur Télécharger. Ensuite, téléchargez ce fichier zip ici."
+
+#: includes/template.options.page.php:77
+msgid "Use Your Icons"
+msgstr "Utilisez vos icônes"
+
+#: includes/template.options.page.php:83
+#, php-format
+msgid ""
+"You will now see your custom icons in all Elementor elements that have icon "
+"selectors in them.<br><br>Looking for more help? You can watch an "
+"instructional video by WPBuilders <a href=\"%s\" target=\"_blank\">here.</a>"
+msgstr ""
+"Vous verrez maintenant vos icônes personnalisées dans tous les éléments "
+"Elementor dotés de sélecteurs d’icônes.<br><br>Vous cherchez plus "
+"d’aide&nbsp;? Vous pouvez regarder une vidéo d’instruction par WPBuilders <a "
+"href=\"%s\" target=\"_blank\">ici.</a>"
+
+#: includes/template.options.page.php:111
+msgid "Upload Fontello Zip"
+msgstr "Télécharger le fichier Fontello zip"
+
+#: includes/template.options.page.php:120
+msgid "Drag & Drop"
+msgstr "Glisser & déposer"
+
+#: includes/template.options.page.php:123
+msgid "your Fontello .zip download here, or"
+msgstr "votre fichier Fontello .zip téléchargé ici, ou"
+
+#: includes/template.options.page.php:126
+msgid "click here to browse"
+msgstr "cliquez ici pour naviguer"
+
+#: includes/template.options.page.php:153
+msgid "Uploaded Fonts"
+msgstr "Polices téléchargées"
+
+#: includes/template.options.page.php:227
+msgid "Regenerate CSS"
+msgstr "Régénérer les styles CSS"
+
+#: includes/template.options.page.php:231
+msgid ""
+"Sometimes you may need to regenerate the CSS file for your custom icons, "
+"such as when you change your WordPress domain or update this plugin."
+msgstr ""
+"Parfois, vous devrez peut-être régénérer le fichier CSS pour vos icônes "
+"personnalisées, par exemple lorsque vous modifiez votre domaine WordPress ou "
+"mettez à jour cette extension."
+
+#: includes/template.options.page.php:233
+msgid "Regenerate"
+msgstr "Régénérer"
+
+#: includes/template.options.page.php:277
+msgid "Delete"
+msgstr "Supprimer"
