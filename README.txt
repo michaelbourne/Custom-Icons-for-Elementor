@@ -3,8 +3,8 @@ Contributors: michaelbourne
 Donate link: https://www.paypal.me/yycpro
 Tags: elementor, icons, fontello, icon fonts
 Requires at least: 4.5
-Tested up to: 4.9.8
-Stable tag: 0.1.3
+Tested up to: 5.0.3
+Stable tag: 0.2.2
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.en.html
 
@@ -12,14 +12,13 @@ Add custom icon fonts and SVGs to the built in Elementor icon controls
 
 == Description ==
 
-Enables the user to add their own custom icons to the built in Elementor icon controls and elements, thereby removing the reliance on FontAwesome and providing a better opportunity for branding with custom icon sets on your websites. Works exclusively through the use of Fontello's free icon font service.
+Enables the user to add their own custom icons to the built in Elementor icon controls and elements, thereby removing the reliance on FontAwesome and providing a better opportunity for branding with custom icon sets on your websites. Works exclusively through the use of Fontello's free icon font service. 
 
 = Plugin Features =
  
-*   Add unlimited icons and SVG icons to your website
-*   Upload multiple icon packs from Fontello
-*   View the icons in each uploaded pack, delete individually if desired
-*   Use icons anywhere you would normally with the default Elementor icon selector
+*   Add unlimited icons and SVG icons to your website via Fontello
+*   View the icons in each uploaded pack, delete individual packs if desired
+*   Use icons anywhere you would normally with the default Elementor icon selectors
 
 Please note, this plugin requires the Elementor Page Builder to be installed and active. [Elementor is a free plugin](https://en-ca.wordpress.org/plugins/elementor/).
 
@@ -46,11 +45,11 @@ You bet! Upload as many as you like, they will all work. However, make sure you 
 
 = HELP! It doesnt work?! =
 
-There is a small, small chance this plugin may not work on your web host. This is caused by two things generally: a mod_security rule flagging the ZIP upload, or the lack of PHP libraries needed to unzip files. Here's the good news: your host can fix both of these easily. If they refuse, consider moving to a more modern host.
+There is a small, small chance this plugin may not work on your web host. This is caused by two things generally: a mod_security rule flagging the ZIP upload, or the lack of PHP libraries needed to unzip files (ZipArchive). Here's the good news: your host can fix both of these easily. If they refuse, consider moving to a more modern host.
 
 == Plugin Removal ==
 
-Removing this plugin will render your custom icons to be broken. Take care to remove them from your elements prior to plugin removal.
+Removing this plugin will render your custom icons to be deleted. Take care to un-select them from your icon elements prior to plugin removal.
 
 == Screenshots ==
 
@@ -58,8 +57,21 @@ None yet
 
 == Changelog ==
 
+= 0.2.2 =
+* Regen error fix
+
+= 0.2.1 =
+* Improve CSS Regen to fix changed URLs
+* Tweak CSS display of icons to match native icons 
+* Change CSS font-face path to relative URLs
+* Add uninstall method to clean up left over files
+
+= 0.1.4 =
+* Fix the "empty box" icon error seen on some sites. Please reupload any affected fonts and regen your css.
+
 = 0.1.3 =
 * Fix error where an un-named font will not render properly
+* Edit content directory reference
 
 = 0.1.2 =
 * Rewriting of help instructions to be more clear
@@ -78,6 +90,15 @@ None yet
 * Initial Public Version
 
 == Upgrade Notice ==
+
+= 0.2.1 =
+You MUST 'regen CSS' after this update.
+
+= 0.1.4 = 
+Fix broken icons on some sites. Font re-upload and regen required if you're affected.
+
+= 0.1.3 =
+Fix un-named font errors
 
 = 0.1.2 =
 Small bug fixes and translations added.

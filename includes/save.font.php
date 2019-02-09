@@ -9,6 +9,10 @@
 * @since     0.1.0
 */
 
+if( ! defined( 'ABSPATH' ) ) {
+    return;
+}
+
 class SaveFont_ECIcons extends ECIcons {
 
 
@@ -84,6 +88,13 @@ class SaveFont_ECIcons extends ECIcons {
 
 	}
 
+	/**
+	 * Update Options table
+	 *
+	 * @param array $font_data
+	 * @param string $status
+	 * @return null|string
+	 */
 	private function update_options( $font_data, $status ) {
 
 		if ( empty( $font_data['name'] ) ) {
@@ -117,7 +128,7 @@ class SaveFont_ECIcons extends ECIcons {
 	 */
 	public function ec_icons_delete_font() {
 
-		//if ( wp_verify_nonce( $this->getRequest( '_wpnonce' ), 'ec_icons_nonce' ) ) {
+		if ( wp_verify_nonce( $this->getRequest( '_wpnonce' ), 'ec_icons_nonce' ) ) {
 
 			$file_name = $this->getRequest( 'file_name', 'font' );
 
@@ -148,7 +159,15 @@ class SaveFont_ECIcons extends ECIcons {
 
 			echo json_encode( $result );
 
-		//}
+		} else {
+
+			$result = array(
+				'status_save' => 'deletefailed',
+			);
+
+			echo json_encode( $result );
+
+		}
 
 		die();
 	}
@@ -156,7 +175,33 @@ class SaveFont_ECIcons extends ECIcons {
 	/**
 	 * Regenerate CSS file
 	 */
-	public function ec_icons_regenerate() {
+	public static function ec_icons_regenerate() {
+
+		$options = get_option( 'ec_icons_fonts' );
+
+		if ( !empty( $options ) && is_array($options) ) {
+
+			$newoptions = array();
+			
+			foreach ( $options as $key => $font ) {
+
+				if ( empty( $font['data'] ) ) {
+					continue;
+				}
+
+				$font_decode = json_decode($font['data'],true);
+
+				$font_data = ec_icons_manager()->get_config_font( $font_decode['file_name'] );
+
+				$newoptions[ $font_data['name'] ] = array(
+					'status' => '1',
+					'data'   => json_encode( $font_data ),
+				);
+
+			}
+			update_option( 'ec_icons_fonts', $newoptions );
+
+		}
 
 		new MergeCss_ECIcons();
 

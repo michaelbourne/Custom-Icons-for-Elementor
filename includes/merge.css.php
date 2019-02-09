@@ -9,6 +9,9 @@
 * @since     0.1.0
 */
 
+if( ! defined( 'ABSPATH' ) ) {
+    return;
+}
 
 class MergeCss_ECIcons extends ECIcons {
 
@@ -24,7 +27,14 @@ class MergeCss_ECIcons extends ECIcons {
 		$options = get_option( 'ec_icons_fonts' );
 
 
-		$css_content = "i.eci{ font-style: normal; }\n";
+		$css_content = "i.eci{ 
+			display: inline-block;
+    		font: normal normal normal 14px/1 FontAwesome;
+    		font-size: inherit;
+    		text-rendering: auto;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+     	}\n";
 		if ( !empty( $options ) && is_array($options) ) {
 			foreach ( $options as $key => $font ) {
 

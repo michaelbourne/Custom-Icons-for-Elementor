@@ -2,7 +2,7 @@
 /*
 Plugin Name: Custom Icons for Elementor
 Description: Add custom icon fonts to the built in Elementor controls
-Version:     0.1.3
+Version:     0.2.2
 Author:      Michael Bourne
 Author URI:  https://michaelbourne.ca
 License:     GPL3
@@ -10,7 +10,7 @@ License URI: https://www.gnu.org/licenses/gpl-3.0.en.html
 Text Domain: custom-icons-for-elementor
 Domain Path: /languages
 */
-/**
+/*
 Custom Icons for Elementor is a plugin for WordPress that enables you to add custom icon fonts to the built in Elementor controls.
 Copyright (c) 2018 Michael Bourne.
 
@@ -21,14 +21,18 @@ This program is distributed in the hope that it will be useful, but WITHOUT ANY 
 You should have received a copy of the GNU General Public License along with this program. If not, see <http://www.gnu.org/licenses/>
 
 You can contact me at michael@michaelbourne.ca
-**/
+*/
+
+if( ! defined( 'ABSPATH' ) ) {
+    return;
+}
 
 defined( 'ECIcons_ROOT' ) or define( 'ECIcons_ROOT', dirname( __FILE__ ) );
 defined( 'ECIcons_URI' ) or define( 'ECIcons_URI', plugin_dir_url( __FILE__ ) );
+defined( 'ECIcons_VERSION' ) or define( 'ECIcons_VERSION', '0.2.1' );
+defined( 'ECIcons_UPLOAD' ) or define( 'ECIcons_UPLOAD', 'elementor_icons_files' );
 
-if ( ! class_exists( 'ECIcons' ) ) {
-
-	class ECIcons {
+class ECIcons {
 
 		/**
 		 * Core singleton class
@@ -45,25 +49,25 @@ if ( ! class_exists( 'ECIcons' ) ) {
 		private $prefix;
 
 		/**
-		 * Path download folder
+		 * Path upload folder
 		 *
 		 * @var $upload_dir
 		 */
 		public $upload_dir;
 
 		/**
-		 * URL download folder
+		 * URL upload folder
 		 *
 		 * @var $upload_url
 		 */
 		private $upload_url;
 
 		/**
-		 * WP-CONTENT folder name
+		 * uploads folder name
 		 *
-		 * @var $content_dir
+		 * @var $upload_dir_single
 		 */
-		private $content_dir;
+		private $upload_dir_single;
 
 		/**
 		 * Prefix for custom icons
@@ -73,20 +77,12 @@ if ( ! class_exists( 'ECIcons' ) ) {
 		private $prefix_icon;
 
 		/**
-		 * Plugin version
-		 *
-		 * @var $version
-		 */
-		private $version;
-
-		/**
 		 * Constructor.
 		 */
 		private function __construct() {
 
-			include_once( ABSPATH . 'wp-admin/includes/plugin.php' );
 
-			// merge css
+			// merge font css to single .css file
 			include_once( ECIcons_ROOT . '/includes/merge.css.php' );
 
 			// save font class
@@ -111,17 +107,18 @@ if ( ! class_exists( 'ECIcons' ) ) {
 			// load icons
 			add_action( 'elementor/controls/controls_registered', array( $this, 'icons_filters' ), 10, 1);
 
+			// default wp upload directory
 			$upload = wp_upload_dir();
 
 			// main variables
 			$this->prefix = 'eci_';
 			$this->prefix_icon = 'efs-';
-			$this->upload_dir  = $upload['basedir'] . '/elementor_icons_files';
-			$this->upload_url  = $upload['baseurl'] . '/elementor_icons_files';
-			$this->content_dir = ( defined(WP_CONTENT_DIR) ) ? WP_CONTENT_DIR : str_replace( get_option('siteurl'), '', content_url() );
+			$this->upload_dir  = $upload['basedir'] . '/' . ECIcons_UPLOAD;
+			$this->upload_url  = $upload['baseurl'] . '/' . ECIcons_UPLOAD;
+			//$this->upload_dir_single = str_replace( get_option('siteurl'), '', $this->upload_url );
 
 			// set plugin version 
-			$this->version = '0.1.3';
+			$this->version = '0.2.0';
 
 			// SSL fix because WordPress core function wp_upload_dir() doesn't check protocol.
 			if ( is_ssl() ) $this->upload_url = str_replace( 'http://', 'https://', $this->upload_url );
@@ -214,13 +211,13 @@ if ( ! class_exists( 'ECIcons' ) ) {
 
 
 		/**
-		 * Admin enqueue scripts
+		 * Enqueue admin scripts
 		 */
 		public function admin_enqueue_scripts() {
 
-			wp_enqueue_style( 'elementor-custom-icons-css', ECIcons_URI . 'assets/css/elementor-custom-icons.css', array(), $this->version );
+			wp_enqueue_style( 'elementor-custom-icons-css', ECIcons_URI . 'assets/css/elementor-custom-icons.css', array(), ECIcons_VERSION );
 
-			wp_enqueue_script( 'elementor-custom-icons', ECIcons_URI . 'assets/js/elementor-custom-icons.js', array('jquery'), $this->version, true );
+			wp_enqueue_script( 'elementor-custom-icons', ECIcons_URI . 'assets/js/elementor-custom-icons.js', array('jquery'), ECIcons_VERSION, true );
 
 			if ( is_admin() ) {
 				$eci_script = array(
@@ -240,7 +237,7 @@ if ( ! class_exists( 'ECIcons' ) ) {
 		}
 
 		/**
-		 * Enqueue scripts
+		 * Enqueue public scripts
 		 */
 		public function enqueue_scripts() {
 
@@ -270,11 +267,11 @@ if ( ! class_exists( 'ECIcons' ) ) {
 			}
 		}
 
-
 		/**
-		 * @param Get font info
+		 * Get uploaded font package's config file
 		 *
-		 * @return array
+		 * @param string $file_name
+		 * @return array $data
 		 */
 		public function get_config_font( $file_name ) {
 
@@ -292,14 +289,15 @@ if ( ! class_exists( 'ECIcons' ) ) {
 				}
 
 				if ( is_string( $file ) && strpos( $file, 'css' ) !== false ) {
-					$file_part          = explode( $this->content_dir, $file );
+					$file_part          = explode( ECIcons_UPLOAD . '/', $file );
 					$data['css_folder'] = $file;
 					$css_folder         = $file_part[1];
 				}
 
 				if ( is_string( $file ) && strpos( $file, 'font' ) !== false ) {
-					$file_part        = explode( $this->content_dir, $file );
-					$data['font_url'] = content_url() . $file_part[1];
+					$file_part        = explode( ECIcons_UPLOAD . '/', $file );
+					//$data['font_url'] = $this->upload_url . $file_part[1];
+					$data['font_url'] = $file_part[1];
 				}
 
 			}
@@ -308,10 +306,10 @@ if ( ! class_exists( 'ECIcons' ) ) {
 				$data['name'] = 'font' . mt_rand();
 				$data['nameempty'] = true;
 				$data['css_root']  = $data['css_folder'] . '/fontello.css';
-				$data['css_url']   = content_url() . $css_folder . '/fontello.css';
+				$data['css_url']   = $this->upload_url . $css_folder . '/fontello.css';
 			} else {
 				$data['css_root']  = $data['css_folder'] . '/' . $data['name'] . '.css';
-				$data['css_url']   = content_url() . $css_folder . '/' . $data['name'] . '.css';
+				$data['css_url']   = $this->upload_url . $css_folder . '/' . $data['name'] . '.css';
 			}
 
 
@@ -323,11 +321,10 @@ if ( ! class_exists( 'ECIcons' ) ) {
 		}
 
 		/**
-		 * Add new icons to elementor
+		 * Add custom icons to Elementor registry
 		 *
-		 * @param $config
-		 *
-		 * @return array
+		 * @param object $controls_registry
+		 * @return void
 		 */
 		public function icons_filters( $controls_registry ) {
 
@@ -361,11 +358,11 @@ if ( ! class_exists( 'ECIcons' ) ) {
 
 
 		/**
-		 * Parse CSS to get icons.
+		 * Parse CSS file to get proper icon names
 		 *
-		 * @param $css_file
-		 *
-		 * @return array
+		 * @param string $css_file
+		 * @param string $name
+		 * @return array $icons
 		 */
 		protected function parse_css( $css_file, $name ) {
 
@@ -386,11 +383,11 @@ if ( ! class_exists( 'ECIcons' ) ) {
 
 
 		/**
-		 * Parse CSS to get icon reverse alias.
+		 * Parse CSS file to get proper icon names (reverse parse)
 		 *
-		 * @param $css_file
-		 *
-		 * @return array
+		 * @param string $css_file
+		 * @param string $name
+		 * @return array $icons
 		 */
 		protected function parse_css_reverse( $css_file, $name ) {
 
@@ -412,7 +409,8 @@ if ( ! class_exists( 'ECIcons' ) ) {
 		/**
 		 * remove folder (recursive)
 		 *
-		 * @param $dir
+		 * @param string $dir
+		 * @return void
 		 */
 		protected function rrmdir( $dir ) {
 
@@ -433,7 +431,7 @@ if ( ! class_exists( 'ECIcons' ) ) {
 		}
 
 		/**
-		 * @param        $name
+		 * @param string $name
 		 * @param bool   $default
 		 * @param string $type
 		 *
@@ -450,15 +448,10 @@ if ( ! class_exists( 'ECIcons' ) ) {
 
 		}
 
-	}
-
-	ECIcons::getInstance();
-
-	/**
-	 * Main manager
-	 */
-	function ec_icons_manager() {
-		return ECIcons::getInstance();
-	}
-
 }
+
+function ec_icons_manager() {
+	return ECIcons::getInstance();
+}
+
+ec_icons_manager();

@@ -126,7 +126,7 @@ jQuery(document).ready(function($) {
 		$( document ).on( 'click', '.eci-box-content.wrapper-list-fonts .delete-font', function( e ) {
 			e.preventDefault();
 
-			var conf = confirm( "Are you sure you want to delete this font?" );
+			var conf = confirm( EC_ICONS.delete );
 			
 			if(conf == true){
 
@@ -189,30 +189,6 @@ jQuery(document).ready(function($) {
 
 		} );
 
-		/* FUTURE: status change*/
-		$( '.wrapper-list-fonts' ).on( 'click', '.eci-extension-status-icon', function( e ) {
-
-			e.preventDefault();
-
-			var request = new FormData(),
-				$this = $( this ),
-				data = $this.closest( '.font-item' ).find( '.delete-font' ).data( 'font' );
-
-			request.append( "file_name", data.name );
-			request.append( "action", "ec_icons_change_status" );
-			request.append( "_wpnonce", $( '.ec-icons-drop' ).find( '#_wpnonce' ).val() );
-
-			if ( $this.hasClass( 'enabled' ) ) {
-				request.append( "sub_action", "enabled" );
-			} else {
-				request.append( "sub_action", "disabled" );
-			}
-
-			ajaxSend( request, function() {
-
-			} );
-
-		} );
 
 		$('.eci-main').on('click', '.eci-extension-info-details', function(){
 			$(this).next( $('.iconlist') ).slideToggle('slow');
