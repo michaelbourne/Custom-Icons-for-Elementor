@@ -3,8 +3,8 @@ Contributors: michaelbourne
 Donate link: https://www.paypal.me/yycpro
 Tags: elementor, icons, fontello, icon fonts
 Requires at least: 4.5
-Tested up to: 5.0.3
-Stable tag: 0.2.2
+Tested up to: 5.1.1
+Stable tag: 0.2.3
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.en.html
 
@@ -57,6 +57,9 @@ None yet
 
 == Changelog ==
 
+= 0.2.3 =
+* Adjusted priority of custom function to prevent certain themes from breaking it
+
 = 0.2.2 =
 * Regen error fix
 
@@ -90,6 +93,9 @@ None yet
 * Initial Public Version
 
 == Upgrade Notice ==
+
+= 0.2.3 =
+Small fix for themes that were conflicting with custom icons being registered.
 
 = 0.2.1 =
 You MUST 'regen CSS' after this update.

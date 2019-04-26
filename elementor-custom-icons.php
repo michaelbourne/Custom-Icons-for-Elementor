@@ -2,7 +2,7 @@
 /*
 Plugin Name: Custom Icons for Elementor
 Description: Add custom icon fonts to the built in Elementor controls
-Version:     0.2.2
+Version:     0.2.3
 Author:      Michael Bourne
 Author URI:  https://michaelbourne.ca
 License:     GPL3
@@ -29,7 +29,7 @@ if( ! defined( 'ABSPATH' ) ) {
 
 defined( 'ECIcons_ROOT' ) or define( 'ECIcons_ROOT', dirname( __FILE__ ) );
 defined( 'ECIcons_URI' ) or define( 'ECIcons_URI', plugin_dir_url( __FILE__ ) );
-defined( 'ECIcons_VERSION' ) or define( 'ECIcons_VERSION', '0.2.1' );
+defined( 'ECIcons_VERSION' ) or define( 'ECIcons_VERSION', '0.2.3' );
 defined( 'ECIcons_UPLOAD' ) or define( 'ECIcons_UPLOAD', 'elementor_icons_files' );
 
 class ECIcons {
@@ -105,7 +105,7 @@ class ECIcons {
 			add_action( 'wp_print_footer_scripts', array( $this, 'insert_footer_css' ) );
 
 			// load icons
-			add_action( 'elementor/controls/controls_registered', array( $this, 'icons_filters' ), 10, 1);
+			add_action( 'elementor/controls/controls_registered', array( $this, 'icons_filters' ), 100, 1);
 
 			// default wp upload directory
 			$upload = wp_upload_dir();
@@ -118,7 +118,7 @@ class ECIcons {
 			//$this->upload_dir_single = str_replace( get_option('siteurl'), '', $this->upload_url );
 
 			// set plugin version 
-			$this->version = '0.2.0';
+			$this->version = '0.2.2';
 
 			// SSL fix because WordPress core function wp_upload_dir() doesn't check protocol.
 			if ( is_ssl() ) $this->upload_url = str_replace( 'http://', 'https://', $this->upload_url );

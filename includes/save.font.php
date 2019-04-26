@@ -175,7 +175,7 @@ class SaveFont_ECIcons extends ECIcons {
 	/**
 	 * Regenerate CSS file
 	 */
-	public static function ec_icons_regenerate() {
+	public function ec_icons_regenerate() {
 
 		$options = get_option( 'ec_icons_fonts' );
 
@@ -191,7 +191,7 @@ class SaveFont_ECIcons extends ECIcons {
 
 				$font_decode = json_decode($font['data'],true);
 
-				$font_data = ec_icons_manager()->get_config_font( $font_decode['file_name'] );
+				$font_data = $this->get_config_font( $font_decode['file_name'] );
 
 				$newoptions[ $font_data['name'] ] = array(
 					'status' => '1',
