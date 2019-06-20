@@ -27,13 +27,16 @@ class MergeCss_ECIcons extends ECIcons {
 		$options = get_option( 'ec_icons_fonts' );
 
 
-		$css_content = "i.eci{ 
-			display: inline-block;
+		$css_content = "i.eci { 
+			display: block;
     		font: normal normal normal 14px/1 FontAwesome;
     		font-size: inherit;
     		text-rendering: auto;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
+     	}
+     	.elementor-editor-active i.eci {
+     	  display: inline-block;
      	}\n";
 		if ( !empty( $options ) && is_array($options) ) {
 			foreach ( $options as $key => $font ) {

@@ -331,6 +331,11 @@ class ECIcons {
 			// Get existing icons
 			$icons = $controls_registry->get_control( 'icon' )->get_settings( 'options' );
 
+			// Provide developer filter to remove FA icons from selectors 
+			if ( apply_filters( 'eci_drop_fa', false ) ) {
+				$icons = array();
+			}
+
 			// get loaded icon files
 			$options = get_option( 'ec_icons_fonts' );
 
@@ -366,11 +371,17 @@ class ECIcons {
 		 */
 		protected function parse_css( $css_file, $name ) {
 
-			$icons = array();
+			/**
 			if ( ! file_exists( $css_file ) ) {
 				return null;
 			}
+			**/
+			
 			$css_source = file_get_contents( $css_file );
+
+			if ( $css_source === false ) return null;
+
+			$icons = array();
 
 			preg_match_all( "/\.\w*?\-(.*?):\w*?\s*?{?\s*?{\s*?\w*?:\s*?\'\\\\?(\w*?)\'.*?}/", $css_source, $matches, PREG_SET_ORDER, 0 );
 			foreach ( $matches as $match ) {
@@ -391,11 +402,17 @@ class ECIcons {
 		 */
 		protected function parse_css_reverse( $css_file, $name ) {
 
-			$icons = array();
+			/**
 			if ( ! file_exists( $css_file ) ) {
 				return null;
 			}
+			**/
+
 			$css_source = file_get_contents( $css_file );
+
+			if ( $css_source === false ) return null;
+
+			$icons = array();
 
 			preg_match_all( "/\.\w*?\-(.*?):\w*?\s*?{?\s*?{\s*?\w*?:\s*?\'\\\\?(\w*?)\'.*?}/", $css_source, $matches, PREG_SET_ORDER, 0 );
 			foreach ( $matches as $match ) {
