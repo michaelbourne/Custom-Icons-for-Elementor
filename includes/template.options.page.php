@@ -182,7 +182,7 @@ $options = get_option( 'ec_icons_fonts' );
 						}
 
 						$font_data  = json_decode( $font['data'], true );
-						$icons      = ec_icons_manager()->parse_css( $font_data['css_root'], $key );
+						$icons      = ec_icons_manager()->parse_css( $font_data['css_root'], $key, $font_data['css_url'] );
 						$first_icon = ! empty( $icons ) ? key( $icons ) : '';
 
 						?>

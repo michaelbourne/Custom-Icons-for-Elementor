@@ -34,6 +34,12 @@ class SaveFont_ECIcons extends ECIcons {
 
 		if ( wp_verify_nonce( $this->getRequest( '_wpnonce' ), 'ec_icons_nonce' ) ) {
 
+			if ( !class_exists('ZipArchive') ) {
+				$result['status_save'] = 'failedopen';
+				echo json_encode( $result );
+				die();
+			}
+
 			$file_name = $this->getRequest( 'file_name', 'font' );
 
 			$result = array();
@@ -58,7 +64,7 @@ class SaveFont_ECIcons extends ECIcons {
 
 				$font_data = $this->get_config_font( $file_name );
 
-				$icons     = $this->parse_css( $font_data['css_root'], $font_data['name'] );
+				$icons     = $this->parse_css( $font_data['css_root'], $font_data['name'], $font_data['css_url'] );
 
 				if ( ! empty( $icons ) && is_array( $icons ) ) {
 					$result['count_icons'] = count( $icons );
@@ -69,13 +75,15 @@ class SaveFont_ECIcons extends ECIcons {
 						$iconlist .= '<div><i class="eci ' . $iconkey . '" style="font-size: 16px;"></i><span>' . $iconkey . '</span></div>';
 					}
 					$result['iconlist'] = $iconlist;
+
+					$result['name'] = $font_data['name'];
+					$result['status_save'] = $this->update_options( $font_data, '1');
+					$result['data'] = $font_data;
+
+					new MergeCss_ECIcons();
+				} else {
+					$result['status_save'] = 'emptyfile';
 				}
-
-				$result['name'] = $font_data['name'];
-				$result['status_save'] = $this->update_options( $font_data, '1');
-				$result['data'] = $font_data;
-
-				new MergeCss_ECIcons();
 
 			} else {
 				$result['status_save'] = 'emptyfile';

@@ -4,7 +4,7 @@ Donate link: https://www.paypal.me/yycpro
 Tags: elementor, icons, fontello, icon fonts
 Requires at least: 4.5
 Tested up to: 5.2.1
-Stable tag: 0.2.3
+Stable tag: 0.2.4
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.en.html
 
@@ -45,9 +45,9 @@ You bet! Upload as many as you like, they will all work. However, make sure you 
 
 = How do I remove Font Awesome icons from the default icon selectors, so that only my custom icons are available? =
 
-Add this to your functions.php file in a chile theme:
+Add this to your functions.php file in a child theme:
 
-add_filter('eci_drop_fa', '__return_true');
+`add_filter('eci_drop_fa', '__return_true');`
 
 = HELP! It doesnt work?! =
 
@@ -62,6 +62,12 @@ Removing this plugin will render your custom icons to be deleted. Take care to u
 None yet
 
 == Changelog ==
+
+= 0.2.4 =
+* Supress PHP warning if Fontello file can't be read by server
+* Add URL fallback for Fontello file reading (some servers are setup in a way that prevents server path reading)
+* Fix "empty Fontello file name" issues by defaulting to ZIP file name instead of random string, thereby fixing the "disappearing icons" in unnamed files
+* Fix CSS issues in editor and icon lists
 
 = 0.2.3 =
 * Adjusted priority of custom function to prevent certain themes from breaking it
@@ -102,6 +108,9 @@ None yet
 * Initial Public Version
 
 == Upgrade Notice ==
+
+= 0.2.4 =
+PHP & CSS fixes
 
 = 0.2.3 =
 Small fix for themes that were conflicting with custom icons being registered. Slight CSS change.

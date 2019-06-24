@@ -2,7 +2,7 @@
 /*
 Plugin Name: Custom Icons for Elementor
 Description: Add custom icon fonts to the built in Elementor controls
-Version:     0.2.3
+Version:     0.2.4
 Author:      Michael Bourne
 Author URI:  https://michaelbourne.ca
 License:     GPL3
@@ -29,7 +29,7 @@ if( ! defined( 'ABSPATH' ) ) {
 
 defined( 'ECIcons_ROOT' ) or define( 'ECIcons_ROOT', dirname( __FILE__ ) );
 defined( 'ECIcons_URI' ) or define( 'ECIcons_URI', plugin_dir_url( __FILE__ ) );
-defined( 'ECIcons_VERSION' ) or define( 'ECIcons_VERSION', '0.2.3' );
+defined( 'ECIcons_VERSION' ) or define( 'ECIcons_VERSION', '0.2.4' );
 defined( 'ECIcons_UPLOAD' ) or define( 'ECIcons_UPLOAD', 'elementor_icons_files' );
 
 class ECIcons {
@@ -118,7 +118,7 @@ class ECIcons {
 			//$this->upload_dir_single = str_replace( get_option('siteurl'), '', $this->upload_url );
 
 			// set plugin version 
-			$this->version = '0.2.2';
+			$this->version = '0.2.4';
 
 			// SSL fix because WordPress core function wp_upload_dir() doesn't check protocol.
 			if ( is_ssl() ) $this->upload_url = str_replace( 'http://', 'https://', $this->upload_url );
@@ -224,7 +224,7 @@ class ECIcons {
 					'ajaxurl'       => admin_url( 'admin-ajax.php' ),
 					'plugin_url'    => ECIcons_URI,
 					'exist'         => __( "This font file already exists. Make sure you're giving it a unique name!", 'custom-icons-for-elementor' ), 
-					'failedopen'    => __( 'Failed to open the ZIP archive. If you uploaded a valid ZIP file, your host may be blocking this PHP function. Please get in touch with them.', 'custom-icons-for-elementor' ), 
+					'failedopen'    => __( 'Failed to open the ZIP archive. If you uploaded a valid Fontello ZIP file, your host may be blocking this PHP function. Please get in touch with them.', 'custom-icons-for-elementor' ), 
 					'failedextract' => __( 'Failed to extract the ZIP archive. Your host may be blocking this PHP function. Please get in touch with them.', 'custom-icons-for-elementor' ), 
 					'emptyfile'     => __( 'Your browser failed to upload the file. Please try again.', 'custom-icons-for-elementor' ), 
 					'regen'         => __( 'Custom Icon CSS file has been regenerated.', 'custom-icons-for-elementor' ), 
@@ -303,13 +303,14 @@ class ECIcons {
 			}
 
 			if ( empty( $data['name'] ) ) {
-				$data['name'] = 'font' . mt_rand();
+				$noname = explode('.', $file_name);
+				$data['name'] = $noname[0];
 				$data['nameempty'] = true;
 				$data['css_root']  = $data['css_folder'] . '/fontello.css';
-				$data['css_url']   = $this->upload_url . $css_folder . '/fontello.css';
+				$data['css_url']   = $this->upload_url . '/' . $css_folder . '/fontello.css';
 			} else {
 				$data['css_root']  = $data['css_folder'] . '/' . $data['name'] . '.css';
-				$data['css_url']   = $this->upload_url . $css_folder . '/' . $data['name'] . '.css';
+				$data['css_url']   = $this->upload_url . '/' . $css_folder . '/' . $data['name'] . '.css';
 			}
 
 
@@ -349,7 +350,7 @@ class ECIcons {
 
 					$font_data = json_decode($font['data'],true);
 
-					$new_icons_reverse = $this->parse_css_reverse( $font_data['css_root'], $font_data['name'] );
+					$new_icons_reverse = $this->parse_css_reverse( $font_data['css_root'], $font_data['name'], $font_data['css_url'] );
 					if ( !empty($new_icons_reverse) && is_array( $new_icons_reverse ) ) {
 						$icons = array_merge($new_icons_reverse, $icons);
 					}
@@ -367,9 +368,10 @@ class ECIcons {
 		 *
 		 * @param string $css_file
 		 * @param string $name
+		 * @param string $url
 		 * @return array $icons
 		 */
-		protected function parse_css( $css_file, $name ) {
+		protected function parse_css( $css_file, $name, $url ) {
 
 			/**
 			if ( ! file_exists( $css_file ) ) {
@@ -377,9 +379,12 @@ class ECIcons {
 			}
 			**/
 			
-			$css_source = file_get_contents( $css_file );
+			$css_source = @file_get_contents( $css_file );
 
-			if ( $css_source === false ) return null;
+			if ( $css_source === false ) {
+				$css_source = @file_get_contents( $url );
+				if ( $css_source === false ) return null;
+			}
 
 			$icons = array();
 
@@ -398,9 +403,10 @@ class ECIcons {
 		 *
 		 * @param string $css_file
 		 * @param string $name
+		 * @param string $url
 		 * @return array $icons
 		 */
-		protected function parse_css_reverse( $css_file, $name ) {
+		protected function parse_css_reverse( $css_file, $name, $url ) {
 
 			/**
 			if ( ! file_exists( $css_file ) ) {
@@ -408,9 +414,12 @@ class ECIcons {
 			}
 			**/
 
-			$css_source = file_get_contents( $css_file );
+			$css_source = @file_get_contents( $css_file );
 
-			if ( $css_source === false ) return null;
+			if ( $css_source === false ) {
+				$css_source = @file_get_contents( $url );
+				if ( $css_source === false ) return null;
+			}
 
 			$icons = array();
 

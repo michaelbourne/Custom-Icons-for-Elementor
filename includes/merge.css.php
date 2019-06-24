@@ -35,7 +35,8 @@ class MergeCss_ECIcons extends ECIcons {
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
      	}
-     	.elementor-editor-active i.eci {
+     	.select2-container i.eci,
+     	.elementor-icon-list-icon i.eci {
      	  display: inline-block;
      	}\n";
 		if ( !empty( $options ) && is_array($options) ) {
@@ -70,7 +71,7 @@ class MergeCss_ECIcons extends ECIcons {
 						  font-style: normal;
 						}\n";
 
-				$icons = ec_icons_manager()->parse_css( $font_data['css_root'], $font_data['name'] );
+				$icons = ec_icons_manager()->parse_css( $font_data['css_root'], $font_data['name'], $font_data['css_url'] );
 
 				if (!empty($icons) && is_array($icons)){
 
