@@ -18,7 +18,7 @@ class SaveFont_ECIcons extends ECIcons {
 
 	public function init() {
 
-		$action = ec_icons_manager()->getRequest( 'action', 'ec_icons_save_font' );
+		$action = ec_icons_manager()->getRequest( 'eci_action', 'ec_icons_save_font' );
 
 		// ajax events
 		add_action( 'wp_ajax_' . $action, array( $this, $action ) );
@@ -190,7 +190,7 @@ class SaveFont_ECIcons extends ECIcons {
 		if ( !empty( $options ) && is_array($options) ) {
 
 			$newoptions = array();
-			
+
 			foreach ( $options as $key => $font ) {
 
 				if ( empty( $font['data'] ) ) {

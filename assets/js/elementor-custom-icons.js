@@ -72,7 +72,7 @@ jQuery(document).ready(function($) {
 
 					request.append( "file_name", file_name );
 					request.append( "source_file", theFile, file_name );
-					request.append( "action", "ec_icons_save_font" );
+					request.append( "eci_action", "ec_icons_save_font" );
 					request.append( "_wpnonce", $( '.ec-icons-drop' ).find( '#_wpnonce' ).val() );
 
 					ajaxSend( request, function( response ) {
@@ -96,13 +96,13 @@ jQuery(document).ready(function($) {
 						}
 						else if ( response.status_save === 'exist' ) {
 							alert( EC_ICONS.exist );
-						} 
+						}
 						else if ( response.status_save === 'failedopen' ) {
 							alert( EC_ICONS.failedopen );
-						} 
+						}
 						else if ( response.status_save === 'failedextract' ) {
 							alert( EC_ICONS.failedextract );
-						} 
+						}
 						else if ( response.status_save === 'emptyfile' ) {
 							alert( EC_ICONS.emptyfile );
 						}
@@ -127,7 +127,7 @@ jQuery(document).ready(function($) {
 			e.preventDefault();
 
 			var conf = confirm( EC_ICONS.delete );
-			
+
 			if(conf == true){
 
 				var request = new FormData(),
@@ -135,7 +135,7 @@ jQuery(document).ready(function($) {
 				data = $this.data( 'font' );
 
 				request.append( "file_name", data.name );
-				request.append( "action", "ec_icons_delete_font" );
+				request.append( "eci_action", "ec_icons_delete_font" );
 				request.append( "_wpnonce", $( '.ec-icons-drop' ).find( '#_wpnonce' ).val() );
 
 				ajaxSend( request, function( response, context ) {
@@ -175,7 +175,7 @@ jQuery(document).ready(function($) {
 			e.preventDefault();
 
 			var request = new FormData();
-			request.append( "action", "ec_icons_regenerate" );
+			request.append( "eci_action", "ec_icons_regenerate" );
 
 			ajaxSend( request, function(response) {
 
