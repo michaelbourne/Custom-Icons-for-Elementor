@@ -4,7 +4,7 @@ Donate link: https://www.paypal.me/yycpro
 Tags: elementor, icons, fontello, icon fonts
 Requires at least: 4.5
 Tested up to: 5.2.1
-Stable tag: 0.2.4
+Stable tag: 0.3
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.en.html
 
@@ -63,6 +63,9 @@ None yet
 
 == Changelog ==
 
+= 0.3 =
+* Added support for the new Elementor v2.6+ icons manager
+
 = 0.2.4 =
 * Supress PHP warning if Fontello file can't be read by server
 * Add URL fallback for Fontello file reading (some servers are setup in a way that prevents server path reading)
@@ -108,6 +111,9 @@ None yet
 * Initial Public Version
 
 == Upgrade Notice ==
+
+= 0.3 =
+Elementor version 2.6+ Support. You MUST 'regen CSS' after this update.
 
 = 0.2.4 =
 PHP & CSS fixes

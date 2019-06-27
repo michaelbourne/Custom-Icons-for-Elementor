@@ -2,7 +2,7 @@
 /*
 Plugin Name: Custom Icons for Elementor
 Description: Add custom icon fonts to the built in Elementor controls
-Version:     0.2.4
+Version:     0.3
 Author:      Michael Bourne
 Author URI:  https://michaelbourne.ca
 License:     GPL3
@@ -29,7 +29,7 @@ if( ! defined( 'ABSPATH' ) ) {
 
 defined( 'ECIcons_ROOT' ) or define( 'ECIcons_ROOT', dirname( __FILE__ ) );
 defined( 'ECIcons_URI' ) or define( 'ECIcons_URI', plugin_dir_url( __FILE__ ) );
-defined( 'ECIcons_VERSION' ) or define( 'ECIcons_VERSION', '0.2.4' );
+defined( 'ECIcons_VERSION' ) or define( 'ECIcons_VERSION', '0.3' );
 defined( 'ECIcons_UPLOAD' ) or define( 'ECIcons_UPLOAD', 'elementor_icons_files' );
 
 class ECIcons {
@@ -106,6 +106,7 @@ class ECIcons {
 
 			// load icons
 			add_action( 'elementor/controls/controls_registered', array( $this, 'icons_filters' ), 100, 1);
+			add_filter( 'elementor/icons_manager/additional_tabs', array( $this, 'icons_filters_new' ), 100, 1);
 
 			// default wp upload directory
 			$upload = wp_upload_dir();
@@ -118,7 +119,7 @@ class ECIcons {
 			//$this->upload_dir_single = str_replace( get_option('siteurl'), '', $this->upload_url );
 
 			// set plugin version 
-			$this->version = '0.2.4';
+			$this->version = '0.3';
 
 			// SSL fix because WordPress core function wp_upload_dir() doesn't check protocol.
 			if ( is_ssl() ) $this->upload_url = str_replace( 'http://', 'https://', $this->upload_url );
@@ -265,6 +266,8 @@ class ECIcons {
 					echo '<link rel="stylesheet" type="text/css" href="' . $this->upload_url . '/merged-icons-font.css?ver=' . $modtime . '">';
 				}
 			}
+
+
 		}
 
 		/**
@@ -308,12 +311,13 @@ class ECIcons {
 				$data['nameempty'] = true;
 				$data['css_root']  = $data['css_folder'] . '/fontello.css';
 				$data['css_url']   = $this->upload_url . '/' . $css_folder . '/fontello.css';
+
 			} else {
 				$data['css_root']  = $data['css_folder'] . '/' . $data['name'] . '.css';
 				$data['css_url']   = $this->upload_url . '/' . $css_folder . '/' . $data['name'] . '.css';
 			}
 
-
+			$data['json_url']   = $this->upload_url . '/' . $data['name'] . '.json';
 			$data['file_name'] = $file_name;
 			
 
@@ -361,6 +365,51 @@ class ECIcons {
 			$controls_registry->get_control( 'icon' )->set_settings( 'options', $icons );
 
 		}
+
+
+		/**
+		 * Add custom icons to Elementor Icons tabs (new in v2.6+)
+		 *
+		 * @param array $tabs Additional tabs for new icon interface.
+		 * @return array $tabs
+		 */
+		public function icons_filters_new( $tabs ) {
+
+			// get loaded icon files
+			$options = get_option( 'ec_icons_fonts' );
+
+			if ( empty( $options ) ) {
+				return;
+			}
+
+			$newicons = [];
+
+			foreach ( $options as $key => $font ) {
+				if ( $font['status'] == '1' ) {
+
+					$font_data = json_decode($font['data'],true);
+					$icons = $this->parse_css( $font_data['css_root'], $font_data['name'], $font_data['css_url'] );
+					$first_icon = ! empty( $icons ) ? key( $icons ) : '';
+
+					$newicons[$font_data['name']] = [
+							'name' => $font_data['name'],
+							'label' => $font_data['name'],
+							'url' => '',
+							'enqueue' => '',
+							'prefix' => '',
+							'displayPrefix' => 'eci ',
+							'labelIcon' => 'eci ' . $first_icon,
+							'ver' => ECIcons_VERSION,
+							'fetchJson' => $font_data['json_url'],
+					];
+
+				}
+			}
+
+			return array_merge($tabs, $newicons);
+
+		}
+
 
 
 		/**
@@ -431,6 +480,7 @@ class ECIcons {
 			return $icons;
 
 		}
+
 
 		/**
 		 * remove folder (recursive)

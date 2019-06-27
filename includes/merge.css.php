@@ -17,6 +17,7 @@ class MergeCss_ECIcons extends ECIcons {
 
 	public function __construct() {
 		$this->generate_css();
+		$this->generate_json();
 	}
 
 	/**
@@ -38,7 +39,14 @@ class MergeCss_ECIcons extends ECIcons {
      	.select2-container i.eci,
      	.elementor-icon-list-icon i.eci {
      	  display: inline-block;
-     	}\n";
+     	}
+     	.elementor-icons-manager__tab__item__icon.eci {
+    		font-size: 28px;
+		}
+		.elementor-icons-manager__tab-link i.eci {
+    		display: inline-block;
+    		font-size: 18px;
+		}\n";
 		if ( !empty( $options ) && is_array($options) ) {
 			foreach ( $options as $key => $font ) {
 
@@ -90,6 +98,49 @@ class MergeCss_ECIcons extends ECIcons {
 		if ( is_dir( ec_icons_manager()->upload_dir  ) ) {
 			file_put_contents( ec_icons_manager()->upload_dir . '/merged-icons-font.css', $css_content );
 		}
+	}
+
+	/**
+	 * Generate new JSON
+	 */
+	private function generate_json() {
+
+		$options = get_option( 'ec_icons_fonts' );
+
+		if ( !empty( $options ) && is_array($options) ) {
+			foreach ( $options as $key => $font ) {
+
+				if ( isset( $font['status'] ) && $font['status'] !== '1' ){
+					continue;
+				}
+
+				if ( empty( $font['data'] ) ) {
+					continue;
+				}
+
+				$font_data = json_decode($font['data'],true);
+
+				$icons = ec_icons_manager()->parse_css( $font_data['css_root'], $font_data['name'], $font_data['css_url'] );
+
+				if (!empty($icons) && is_array($icons)){
+
+					$json = [];
+					$json['icons'] = [];
+
+					foreach ( $icons as $name_icon => $code ) {
+						$json['icons'][] = $name_icon;
+
+					}
+				}
+
+				if ( is_dir( ec_icons_manager()->upload_dir  ) ) {
+					file_put_contents( ec_icons_manager()->upload_dir . '/' . $font_data['name'] . '.json', json_encode($json) );
+				}
+
+			}
+		}
+
+
 	}
 
 }
