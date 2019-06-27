@@ -190,7 +190,7 @@ class SaveFont_ECIcons extends ECIcons {
 		if ( !empty( $options ) && is_array($options) ) {
 
 			$newoptions = array();
-			
+
 			foreach ( $options as $key => $font ) {
 
 				if ( empty( $font['data'] ) ) {

@@ -96,13 +96,13 @@ jQuery(document).ready(function($) {
 						}
 						else if ( response.status_save === 'exist' ) {
 							alert( EC_ICONS.exist );
-						} 
+						}
 						else if ( response.status_save === 'failedopen' ) {
 							alert( EC_ICONS.failedopen );
-						} 
+						}
 						else if ( response.status_save === 'failedextract' ) {
 							alert( EC_ICONS.failedextract );
-						} 
+						}
 						else if ( response.status_save === 'emptyfile' ) {
 							alert( EC_ICONS.emptyfile );
 						}
