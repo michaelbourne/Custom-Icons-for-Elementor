@@ -108,6 +108,12 @@ class ECIcons {
 			add_action( 'elementor/controls/controls_registered', array( $this, 'icons_filters' ), 100, 1);
 			add_filter( 'elementor/icons_manager/additional_tabs', array( $this, 'icons_filters_new' ), 100, 1);
 
+			// Provide developer filter to remove FA icons from selectors 
+			if ( apply_filters( 'eci_drop_fa', false ) ) {
+				// TODO: this doesn't work yet, because the "default icon" in widgets requires these tabs to be active. Need to override all default icon selections in all icon based widgets to enable this.
+				//add_filter( 'elementor/icons_manager/native', '__return_empty_array' );
+			}
+
 			// default wp upload directory
 			$upload = wp_upload_dir();
 
@@ -266,7 +272,6 @@ class ECIcons {
 					echo '<link rel="stylesheet" type="text/css" href="' . $this->upload_url . '/merged-icons-font.css?ver=' . $modtime . '">';
 				}
 			}
-
 
 		}
 

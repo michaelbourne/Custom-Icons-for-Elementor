@@ -18,11 +18,12 @@ class SaveFont_ECIcons extends ECIcons {
 
 	public function init() {
 
-		$action = ec_icons_manager()->getRequest( 'eci_action', 'ec_icons_save_font' );
+		$action = ec_icons_manager()->getRequest( 'action' );
 
 		// ajax events
-		add_action( 'wp_ajax_' . $action, array( $this, $action ) );
-
+		if ( ! empty( $action) && is_callable( array( $this, $action ) ) ){
+			add_action( 'wp_ajax_' . $action, array( $this, $action ) );
+		}
 	}
 
 

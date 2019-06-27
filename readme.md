@@ -29,7 +29,7 @@ You bet! Upload as many as you like, they will all work. However, make sure you 
 
 **How do I remove Font Awesome icons from the default icon selectors, so that only my custom icons are available?**
 
-In Elementor versions < 2.6.x, add this to your functions.php file in a child theme:
+Add this to your functions.php file in a child theme:
 
 `add_filter('eci_drop_fa', '__return_true');`
 
