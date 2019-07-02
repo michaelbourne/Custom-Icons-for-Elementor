@@ -18,7 +18,7 @@ class SaveFont_ECIcons extends ECIcons {
 
 	public function init() {
 
-		$action = ec_icons_manager()->getRequest( 'action' );
+		$action = $this->getRequest( 'action' );
 
 		// ajax events
 		if ( ! empty( $action) && is_callable( array( $this, $action ) ) ){

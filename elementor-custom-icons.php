@@ -250,7 +250,7 @@ class ECIcons {
 
 			if ( file_exists( $this->upload_dir . '/merged-icons-font.css' ) ) {
 
-				$modtime = @filemtime( $this->upload_dir . '/merged-icons-font.css' );
+				$modtime = get_option( 'eci_css_timestamp' );
 				if(!$modtime){ $modtime = mt_rand(); }
 				wp_enqueue_style( 'eci-icon-fonts', esc_url( $this->upload_url . '/merged-icons-font.css' ), false, $modtime );
 			}
@@ -267,7 +267,7 @@ class ECIcons {
 
 				if ( file_exists( $this->upload_dir . '/merged-icons-font.css' ) ) {
 
-					$modtime = @filemtime( $this->upload_dir . '/merged-icons-font.css' );
+					$modtime = get_option( 'eci_css_timestamp' );
 					if(!$modtime){ $modtime = mt_rand(); }
 					echo '<link rel="stylesheet" type="text/css" href="' . $this->upload_url . '/merged-icons-font.css?ver=' . $modtime . '">';
 				}

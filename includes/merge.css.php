@@ -79,7 +79,7 @@ class MergeCss_ECIcons extends ECIcons {
 						  font-style: normal;
 						}\n";
 
-				$icons = ec_icons_manager()->parse_css( $font_data['css_root'], $font_data['name'], $font_data['css_url'] );
+				$icons = $this->parse_css( $font_data['css_root'], $font_data['name'], $font_data['css_url'] );
 
 				if (!empty($icons) && is_array($icons)){
 
@@ -95,8 +95,9 @@ class MergeCss_ECIcons extends ECIcons {
 		}
 
 		$css_content = preg_replace( '/\t+/', '', $css_content );
-		if ( is_dir( ec_icons_manager()->upload_dir  ) ) {
-			file_put_contents( ec_icons_manager()->upload_dir . '/merged-icons-font.css', $css_content );
+		if ( is_dir( $this->upload_dir  ) ) {
+			file_put_contents( $this->upload_dir . '/merged-icons-font.css', $css_content );
+			update_option( 'eci_css_timestamp', time(), true );
 		}
 	}
 
@@ -120,7 +121,7 @@ class MergeCss_ECIcons extends ECIcons {
 
 				$font_data = json_decode($font['data'],true);
 
-				$icons = ec_icons_manager()->parse_css( $font_data['css_root'], $font_data['name'], $font_data['css_url'] );
+				$icons = $this->parse_css( $font_data['css_root'], $font_data['name'], $font_data['css_url'] );
 
 				if (!empty($icons) && is_array($icons)){
 
@@ -133,8 +134,8 @@ class MergeCss_ECIcons extends ECIcons {
 					}
 				}
 
-				if ( is_dir( ec_icons_manager()->upload_dir  ) ) {
-					file_put_contents( ec_icons_manager()->upload_dir . '/' . $font_data['name'] . '.json', json_encode($json) );
+				if ( is_dir( $this->upload_dir  ) ) {
+					file_put_contents( $this->upload_dir . '/' . $font_data['name'] . '.json', json_encode($json) );
 				}
 
 			}
