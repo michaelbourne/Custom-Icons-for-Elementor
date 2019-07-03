@@ -23,8 +23,8 @@ You should have received a copy of the GNU General Public License along with thi
 You can contact me at michael@michaelbourne.ca
 */
 
-if( ! defined( 'ABSPATH' ) ) {
-    return;
+if ( ! defined( 'ABSPATH' ) ) {
+	return;
 }
 
 defined( 'ECIcons_ROOT' ) or define( 'ECIcons_ROOT', dirname( __FILE__ ) );
@@ -34,246 +34,249 @@ defined( 'ECIcons_UPLOAD' ) or define( 'ECIcons_UPLOAD', 'elementor_icons_files'
 
 class ECIcons {
 
-		/**
-		 * Core singleton class
-		 *
-		 * @var self - pattern realization
-		 */
-		private static $_instance;
+	/**
+	 * Core singleton class
+	 *
+	 * @var self - pattern realization
+	 */
+	private static $_instance;
 
-		/**
-		 * Prefix for plugin
-		 *
-		 * @var $prefix
-		 */
-		private $prefix;
+	/**
+	 * Prefix for plugin
+	 *
+	 * @var $prefix
+	 */
+	private $prefix;
 
-		/**
-		 * Path upload folder
-		 *
-		 * @var $upload_dir
-		 */
-		public $upload_dir;
+	/**
+	 * Path upload folder
+	 *
+	 * @var $upload_dir
+	 */
+	public $upload_dir;
 
-		/**
-		 * URL upload folder
-		 *
-		 * @var $upload_url
-		 */
-		private $upload_url;
+	/**
+	 * URL upload folder
+	 *
+	 * @var $upload_url
+	 */
+	private $upload_url;
 
-		/**
-		 * uploads folder name
-		 *
-		 * @var $upload_dir_single
-		 */
-		private $upload_dir_single;
+	/**
+	 * uploads folder name
+	 *
+	 * @var $upload_dir_single
+	 */
+	private $upload_dir_single;
 
-		/**
-		 * Prefix for custom icons
-		 *
-		 * @var $prefix_icon
-		 */
-		private $prefix_icon;
+	/**
+	 * Prefix for custom icons
+	 *
+	 * @var $prefix_icon
+	 */
+	private $prefix_icon;
 
-		/**
-		 * Constructor.
-		 */
-		private function __construct() {
+	/**
+	 * Constructor.
+	 */
+	private function __construct() {
 
+		// merge font css to single .css file
+		include_once( ECIcons_ROOT . '/includes/merge.css.php' );
 
-			// merge font css to single .css file
-			include_once( ECIcons_ROOT . '/includes/merge.css.php' );
+		// save font class
+		include_once( ECIcons_ROOT . '/includes/save.font.php' );
 
-			// save font class
-			include_once( ECIcons_ROOT . '/includes/save.font.php' );
+		// add menu item
+		add_action( 'admin_menu', array( $this, 'add_admin_menu' ), 99 );
 
-			// add menu item
-			add_action( 'admin_menu', array( $this, 'add_admin_menu' ), 99 );
+		add_action( 'admin_init', array( $this, 'admin_init' ) );
 
-			add_action( 'admin_init', array( $this, 'admin_init' ) );
+		// add admin styles and scripts
+		add_action( 'admin_enqueue_scripts', array( $this, 'admin_enqueue_scripts' ) );
+		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
 
-			// add admin styles and scripts
-			add_action( 'admin_enqueue_scripts', array( $this, 'admin_enqueue_scripts' ) );
-			add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
+		// for front end
+		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ), 999999 );
+		add_action( 'wp_enqueue_scripts_clean', array( $this, 'enqueue_scripts' ), 10 );
 
-			// for front end
-			add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ), 999999 );
-			add_action( 'wp_enqueue_scripts_clean', array( $this, 'enqueue_scripts' ), 10 );
-			
-			// add icon css to footer for builder support
-			add_action( 'wp_print_footer_scripts', array( $this, 'insert_footer_css' ) );
+		// add icon css to footer for builder support
+		add_action( 'wp_print_footer_scripts', array( $this, 'insert_footer_css' ) );
 
-			// load icons
-			add_action( 'elementor/controls/controls_registered', array( $this, 'icons_filters' ), 100, 1);
-			add_filter( 'elementor/icons_manager/additional_tabs', array( $this, 'icons_filters_new' ), 100, 1);
+		// load icons
+		add_action( 'elementor/controls/controls_registered', array( $this, 'icons_filters' ), 100, 1 );
+		add_filter( 'elementor/icons_manager/additional_tabs', array( $this, 'icons_filters_new' ), 100, 1 );
 
-			// Provide developer filter to remove FA icons from selectors 
-			if ( apply_filters( 'eci_drop_fa', false ) ) {
-				// TODO: this doesn't work yet, because the "default icon" in widgets requires these tabs to be active. Need to override all default icon selections in all icon based widgets to enable this.
-				//add_filter( 'elementor/icons_manager/native', '__return_empty_array' );
-			}
-
-			// default wp upload directory
-			$upload = wp_upload_dir();
-
-			// main variables
-			$this->prefix = 'eci_';
-			$this->prefix_icon = 'efs-';
-			$this->upload_dir  = $upload['basedir'] . '/' . ECIcons_UPLOAD;
-			$this->upload_url  = $upload['baseurl'] . '/' . ECIcons_UPLOAD;
-			//$this->upload_dir_single = str_replace( get_option('siteurl'), '', $this->upload_url );
-
-			// set plugin version 
-			$this->version = '0.3';
-
-			// SSL fix because WordPress core function wp_upload_dir() doesn't check protocol.
-			if ( is_ssl() ) $this->upload_url = str_replace( 'http://', 'https://', $this->upload_url );
-
-			// load translations
-			add_action( 'plugins_loaded', array( $this, 'eci_load_textdomain' ) );
+		// Provide developer filter to remove FA icons from selectors
+		if ( apply_filters( 'eci_drop_fa', false ) ) {
+			// TODO: this doesn't work yet, because the "default icon" in widgets requires these tabs to be active. Need to override all default icon selections in all icon based widgets to enable this.
+			//add_filter( 'elementor/icons_manager/native', '__return_empty_array' );
 		}
+
+		// default wp upload directory
+		$upload = wp_upload_dir();
+
+		// main variables
+		$this->prefix      = 'eci_';
+		$this->prefix_icon = 'efs-';
+		$this->upload_dir  = $upload['basedir'] . '/' . ECIcons_UPLOAD;
+		$this->upload_url  = $upload['baseurl'] . '/' . ECIcons_UPLOAD;
+		//$this->upload_dir_single = str_replace( get_option('siteurl'), '', $this->upload_url );
+
+		// set plugin version
+		$this->version = '0.3';
+
+		// SSL fix because WordPress core function wp_upload_dir() doesn't check protocol.
+		if ( is_ssl() ) {
+			$this->upload_url = str_replace( 'http://', 'https://', $this->upload_url );
+		}
+
+		// load translations
+		add_action( 'plugins_loaded', array( $this, 'eci_load_textdomain' ) );
+	}
 
 		/**
 		 * Get the instance of ECIcons Plugins
 		 *
 		 * @return self
 		 */
-		public static function getInstance() {
+	public static function getInstance() {
 
-			if ( ! ( self::$_instance instanceof self ) ) {
-				self::$_instance = new self();
-			}
-
-			return self::$_instance;
-
+		if ( ! ( self::$_instance instanceof self ) ) {
+			self::$_instance = new self();
 		}
+
+		return self::$_instance;
+
+	}
 
 		/**
 		 * @param mixed $instance
 		 */
-		public static function setInstance( $instance ) {
+	public static function setInstance( $instance ) {
 
-			self::$_instance = $instance;
+		self::$_instance = $instance;
 
-		}
+	}
 
 		/**
 		 * Init main functions (for hook admin_init)
 		 */
-		public function admin_init() {
+	public function admin_init() {
 
-			$this->settings_init();
+		$this->settings_init();
 
-			$saveFont = new SaveFont_ECIcons();
-			$saveFont->init();
+		$saveFont = new SaveFont_ECIcons();
+		$saveFont->init();
 
-		}
+	}
 
 		/**
 		 * Internationalization
 		 */
-		public function eci_load_textdomain() {
-			load_plugin_textdomain( 'custom-icons-for-elementor', false, dirname( plugin_basename(__FILE__) ) . '/languages/' );
-		}
+	public function eci_load_textdomain() {
+		load_plugin_textdomain( 'custom-icons-for-elementor', false, dirname( plugin_basename( __FILE__ ) ) . '/languages/' );
+	}
 
 		/**
 		 * Add new pages to admin
 		 */
-		public function add_admin_menu() {
+	public function add_admin_menu() {
 
-			add_submenu_page( 
-				'elementor',
-				__( 'Custom Icons for Elementor', 'custom-icons-for-elementor' ), 
-				__( 'Custom Icons', 'custom-icons-for-elementor' ), 
-				'manage_options', 
-				'elementor-custom-icons', 
-				array(
-					$this,
-					'options_page',
-				)
-			);
+		add_submenu_page(
+			'elementor',
+			__( 'Custom Icons for Elementor', 'custom-icons-for-elementor' ),
+			__( 'Custom Icons', 'custom-icons-for-elementor' ),
+			'manage_options',
+			'elementor-custom-icons',
+			array(
+				$this,
+				'options_page',
+			)
+		);
 
-		}
+	}
 
 		/**
 		 * Render all options
 		 */
-		public function options_page() {
+	public function options_page() {
 
-			include_once 'includes/template.options.page.php';
+		include_once 'includes/template.options.page.php';
 
-		}
+	}
 
 
 		/**
 		 * ECIcons settings init
 		 */
-		protected function settings_init() {
+	protected function settings_init() {
 
-			register_setting( $this->prefix . 'fontellos_page', $this->prefix . 'elementor_icons_settings' );
-			add_settings_section( $this->prefix . 'fontellos_pluginPage_section', '', '', $this->prefix . 'fontellos_page' );
+		register_setting( $this->prefix . 'fontellos_page', $this->prefix . 'elementor_icons_settings' );
+		add_settings_section( $this->prefix . 'fontellos_pluginPage_section', '', '', $this->prefix . 'fontellos_page' );
 
-		}
+	}
 
 
 		/**
 		 * Enqueue admin scripts
 		 */
-		public function admin_enqueue_scripts() {
+	public function admin_enqueue_scripts() {
 
-			wp_enqueue_style( 'elementor-custom-icons-css', ECIcons_URI . 'assets/css/elementor-custom-icons.css', array(), ECIcons_VERSION );
+		wp_enqueue_style( 'elementor-custom-icons-css', ECIcons_URI . 'assets/css/elementor-custom-icons.css', array(), ECIcons_VERSION );
 
-			wp_enqueue_script( 'elementor-custom-icons', ECIcons_URI . 'assets/js/elementor-custom-icons.js', array('jquery'), ECIcons_VERSION, true );
+		wp_enqueue_script( 'elementor-custom-icons', ECIcons_URI . 'assets/js/elementor-custom-icons.js', array( 'jquery' ), ECIcons_VERSION, true );
 
-			if ( is_admin() ) {
-				$eci_script = array(
-					'ajaxurl'       => admin_url( 'admin-ajax.php' ),
-					'plugin_url'    => ECIcons_URI,
-					'exist'         => __( "This font file already exists. Make sure you're giving it a unique name!", 'custom-icons-for-elementor' ), 
-					'failedopen'    => __( 'Failed to open the ZIP archive. If you uploaded a valid Fontello ZIP file, your host may be blocking this PHP function. Please get in touch with them.', 'custom-icons-for-elementor' ), 
-					'failedextract' => __( 'Failed to extract the ZIP archive. Your host may be blocking this PHP function. Please get in touch with them.', 'custom-icons-for-elementor' ), 
-					'emptyfile'     => __( 'Your browser failed to upload the file. Please try again.', 'custom-icons-for-elementor' ), 
-					'regen'         => __( 'Custom Icon CSS file has been regenerated.', 'custom-icons-for-elementor' ), 
-					'delete'        => __( 'Are you sure you want to delete this font?', 'custom-icons-for-elementor' ), 
-					'updatefailed'  => __( 'Plugin failed to update the WP options table.', 'custom-icons-for-elementor' ), 
-				);
-				wp_localize_script( 'elementor-custom-icons', 'EC_ICONS', $eci_script );
-			}
-
+		if ( is_admin() ) {
+			$eci_script = array(
+				'ajaxurl'       => admin_url( 'admin-ajax.php' ),
+				'plugin_url'    => ECIcons_URI,
+				'exist'         => __( "This font file already exists. Make sure you're giving it a unique name!", 'custom-icons-for-elementor' ),
+				'failedopen'    => __( 'Failed to open the ZIP archive. If you uploaded a valid Fontello ZIP file, your host may be blocking this PHP function. Please get in touch with them.', 'custom-icons-for-elementor' ),
+				'failedextract' => __( 'Failed to extract the ZIP archive. Your host may be blocking this PHP function. Please get in touch with them.', 'custom-icons-for-elementor' ),
+				'emptyfile'     => __( 'Your browser failed to upload the file. Please try again.', 'custom-icons-for-elementor' ),
+				'regen'         => __( 'Custom Icon CSS file has been regenerated.', 'custom-icons-for-elementor' ),
+				'delete'        => __( 'Are you sure you want to delete this font?', 'custom-icons-for-elementor' ),
+				'updatefailed'  => __( 'Plugin failed to update the WP options table.', 'custom-icons-for-elementor' ),
+			);
+			wp_localize_script( 'elementor-custom-icons', 'EC_ICONS', $eci_script );
 		}
+
+	}
 
 		/**
 		 * Enqueue public scripts
 		 */
-		public function enqueue_scripts() {
+	public function enqueue_scripts() {
 
-			if ( file_exists( $this->upload_dir . '/merged-icons-font.css' ) ) {
+		if ( file_exists( $this->upload_dir . '/merged-icons-font.css' ) ) {
 
-				$modtime = get_option( 'eci_css_timestamp' );
-				if(!$modtime){ $modtime = mt_rand(); }
-				wp_enqueue_style( 'eci-icon-fonts', esc_url( $this->upload_url . '/merged-icons-font.css' ), false, $modtime );
-			}
-
+			$modtime = get_option( 'eci_css_timestamp' );
+			if ( ! $modtime ) {
+				$modtime = mt_rand(); }
+			wp_enqueue_style( 'eci-icon-fonts', esc_url( $this->upload_url . '/merged-icons-font.css' ), false, $modtime );
 		}
+
+	}
 
 		/**
 		 * Add custom font CSS to footer so it actually works in the builder
 		 * - to do: get this working with the builder boilerplate action
 		 */
-		public function insert_footer_css() {
+	public function insert_footer_css() {
 
-			if( current_user_can( 'manage_options' ) ){
+		if ( current_user_can( 'manage_options' ) ) {
 
-				if ( file_exists( $this->upload_dir . '/merged-icons-font.css' ) ) {
+			if ( file_exists( $this->upload_dir . '/merged-icons-font.css' ) ) {
 
-					$modtime = get_option( 'eci_css_timestamp' );
-					if(!$modtime){ $modtime = mt_rand(); }
-					echo '<link rel="stylesheet" type="text/css" href="' . $this->upload_url . '/merged-icons-font.css?ver=' . $modtime . '">';
-				}
+				$modtime = get_option( 'eci_css_timestamp' );
+				if ( ! $modtime ) {
+					$modtime = mt_rand(); }
+				echo '<link rel="stylesheet" type="text/css" href="' . $this->upload_url . '/merged-icons-font.css?ver=' . $modtime . '">';
 			}
-
 		}
+
+	}
 
 		/**
 		 * Get uploaded font package's config file
@@ -281,54 +284,52 @@ class ECIcons {
 		 * @param string $file_name
 		 * @return array $data
 		 */
-		public function get_config_font( $file_name ) {
+	public function get_config_font( $file_name ) {
 
-			$file_config = glob( $this->upload_dir . '/' . $file_name . '/*/*' );
-			$data        = array();
-			$css_folder  = '';
+		$file_config = glob( $this->upload_dir . '/' . $file_name . '/*/*' );
+		$data        = array();
+		$css_folder  = '';
 
-			foreach ( $file_config as $key => $file ) {
+		foreach ( $file_config as $key => $file ) {
 
-				if ( strpos( $file, 'config.json' ) !== false ) {
-					$file_info               = json_decode( file_get_contents( $file ) );
-					$data['name']            = trim($file_info->name);
-					$data['icons']           = $file_info->glyphs;
-					$data['css_prefix_text'] = $file_info->css_prefix_text;
-				}
-
-				if ( is_string( $file ) && strpos( $file, 'css' ) !== false ) {
-					$file_part          = explode( ECIcons_UPLOAD . '/', $file );
-					$data['css_folder'] = $file;
-					$css_folder         = $file_part[1];
-				}
-
-				if ( is_string( $file ) && strpos( $file, 'font' ) !== false ) {
-					$file_part        = explode( ECIcons_UPLOAD . '/', $file );
-					//$data['font_url'] = $this->upload_url . $file_part[1];
-					$data['font_url'] = $file_part[1];
-				}
-
+			if ( strpos( $file, 'config.json' ) !== false ) {
+				$file_info               = json_decode( file_get_contents( $file ) );
+				$data['name']            = trim( $file_info->name );
+				$data['icons']           = $file_info->glyphs;
+				$data['css_prefix_text'] = $file_info->css_prefix_text;
 			}
 
-			if ( empty( $data['name'] ) ) {
-				$noname = explode('.', $file_name);
-				$data['name'] = $noname[0];
-				$data['nameempty'] = true;
-				$data['css_root']  = $data['css_folder'] . '/fontello.css';
-				$data['css_url']   = $this->upload_url . '/' . $css_folder . '/fontello.css';
-
-			} else {
-				$data['css_root']  = $data['css_folder'] . '/' . $data['name'] . '.css';
-				$data['css_url']   = $this->upload_url . '/' . $css_folder . '/' . $data['name'] . '.css';
+			if ( is_string( $file ) && strpos( $file, 'css' ) !== false ) {
+				$file_part          = explode( ECIcons_UPLOAD . '/', $file );
+				$data['css_folder'] = $file;
+				$css_folder         = $file_part[1];
 			}
 
-			$data['json_url']   = $this->upload_url . '/' . $data['name'] . '.json';
-			$data['file_name'] = $file_name;
-			
-
-			return $data;
-
+			if ( is_string( $file ) && strpos( $file, 'font' ) !== false ) {
+				$file_part = explode( ECIcons_UPLOAD . '/', $file );
+				//$data['font_url'] = $this->upload_url . $file_part[1];
+				$data['font_url'] = $file_part[1];
+			}
 		}
+
+		if ( empty( $data['name'] ) ) {
+			$noname            = explode( '.', $file_name );
+			$data['name']      = $noname[0];
+			$data['nameempty'] = true;
+			$data['css_root']  = $data['css_folder'] . '/fontello.css';
+			$data['css_url']   = $this->upload_url . '/' . $css_folder . '/fontello.css';
+
+		} else {
+			$data['css_root'] = $data['css_folder'] . '/' . $data['name'] . '.css';
+			$data['css_url']  = $this->upload_url . '/' . $css_folder . '/' . $data['name'] . '.css';
+		}
+
+		$data['json_url']  = $this->upload_url . '/' . $data['name'] . '.json';
+		$data['file_name'] = $file_name;
+
+		return $data;
+
+	}
 
 		/**
 		 * Add custom icons to Elementor registry
@@ -336,40 +337,39 @@ class ECIcons {
 		 * @param object $controls_registry
 		 * @return void
 		 */
-		public function icons_filters( $controls_registry ) {
+	public function icons_filters( $controls_registry ) {
 
-			// Get existing icons
-			$icons = $controls_registry->get_control( 'icon' )->get_settings( 'options' );
+		// Get existing icons
+		$icons = $controls_registry->get_control( 'icon' )->get_settings( 'options' );
 
-			// Provide developer filter to remove FA icons from selectors 
-			if ( apply_filters( 'eci_drop_fa', false ) ) {
-				$icons = array();
-			}
+		// Provide developer filter to remove FA icons from selectors
+		if ( apply_filters( 'eci_drop_fa', false ) ) {
+			$icons = array();
+		}
 
-			// get loaded icon files
-			$options = get_option( 'ec_icons_fonts' );
+		// get loaded icon files
+		$options = get_option( 'ec_icons_fonts' );
 
+		if ( empty( $options ) ) {
+			return;
+		}
 
-			if ( empty( $options ) ) {
-				return;
-			}
+		foreach ( $options as $key => $font ) {
+			if ( $font['status'] == '1' ) {
 
-			foreach ( $options as $key => $font ) {
-				if ( $font['status'] == '1' ) {
+				$font_data = json_decode( $font['data'], true );
 
-					$font_data = json_decode($font['data'],true);
-
-					$new_icons_reverse = $this->parse_css_reverse( $font_data['css_root'], $font_data['name'], $font_data['css_url'] );
-					if ( !empty($new_icons_reverse) && is_array( $new_icons_reverse ) ) {
-						$icons = array_merge($new_icons_reverse, $icons);
-					}
+				$new_icons_reverse = $this->parse_css_reverse( $font_data['css_root'], $font_data['name'], $font_data['css_url'] );
+				if ( ! empty( $new_icons_reverse ) && is_array( $new_icons_reverse ) ) {
+					$icons = array_merge( $new_icons_reverse, $icons );
 				}
 			}
-
-			// send back new array
-			$controls_registry->get_control( 'icon' )->set_settings( 'options', $icons );
-
 		}
+
+		// send back new array
+		$controls_registry->get_control( 'icon' )->set_settings( 'options', $icons );
+
+	}
 
 
 		/**
@@ -378,42 +378,42 @@ class ECIcons {
 		 * @param array $tabs Additional tabs for new icon interface.
 		 * @return array $tabs
 		 */
-		public function icons_filters_new( $tabs ) {
+	public function icons_filters_new( $tabs ) {
 
-			// get loaded icon files
-			$options = get_option( 'ec_icons_fonts' );
+		// get loaded icon files
+		$options = get_option( 'ec_icons_fonts' );
 
-			if ( empty( $options ) ) {
-				return;
-			}
-
-			$newicons = [];
-
-			foreach ( $options as $key => $font ) {
-				if ( $font['status'] == '1' ) {
-
-					$font_data = json_decode($font['data'],true);
-					$icons = $this->parse_css( $font_data['css_root'], $font_data['name'], $font_data['css_url'] );
-					$first_icon = ! empty( $icons ) ? key( $icons ) : '';
-
-					$newicons[$font_data['name']] = [
-							'name' => $font_data['name'],
-							'label' => $font_data['name'],
-							'url' => '',
-							'enqueue' => '',
-							'prefix' => '',
-							'displayPrefix' => 'eci ',
-							'labelIcon' => 'eci ' . $first_icon,
-							'ver' => ECIcons_VERSION,
-							'fetchJson' => $font_data['json_url'],
-					];
-
-				}
-			}
-
-			return array_merge($tabs, $newicons);
-
+		if ( empty( $options ) ) {
+			return;
 		}
+
+		$newicons = [];
+
+		foreach ( $options as $key => $font ) {
+			if ( $font['status'] == '1' ) {
+
+				$font_data  = json_decode( $font['data'], true );
+				$icons      = $this->parse_css( $font_data['css_root'], $font_data['name'], $font_data['css_url'] );
+				$first_icon = ! empty( $icons ) ? key( $icons ) : '';
+
+				$newicons[ $font_data['name'] ] = [
+					'name'          => $font_data['name'],
+					'label'         => $font_data['name'],
+					'url'           => '',
+					'enqueue'       => '',
+					'prefix'        => '',
+					'displayPrefix' => 'eci ',
+					'labelIcon'     => 'eci ' . $first_icon,
+					'ver'           => ECIcons_VERSION,
+					'fetchJson'     => $font_data['json_url'],
+				];
+
+			}
+		}
+
+		return array_merge( $tabs, $newicons );
+
+	}
 
 
 
@@ -425,31 +425,33 @@ class ECIcons {
 		 * @param string $url
 		 * @return array $icons
 		 */
-		protected function parse_css( $css_file, $name, $url ) {
+	protected function parse_css( $css_file, $name, $url ) {
 
-			/**
-			if ( ! file_exists( $css_file ) ) {
+		/**
+		if ( ! file_exists( $css_file ) ) {
+			return null;
+		}
+		**/
+
+		$css_source = @file_get_contents( $css_file );
+
+		if ( $css_source === false ) {
+			$css_source = @file_get_contents( $url );
+			if ( $css_source === false ) {
 				return null;
 			}
-			**/
-			
-			$css_source = @file_get_contents( $css_file );
-
-			if ( $css_source === false ) {
-				$css_source = @file_get_contents( $url );
-				if ( $css_source === false ) return null;
-			}
-
-			$icons = array();
-
-			preg_match_all( "/\.\w*?\-(.*?):\w*?\s*?{?\s*?{\s*?\w*?:\s*?\'\\\\?(\w*?)\'.*?}/", $css_source, $matches, PREG_SET_ORDER, 0 );
-			foreach ( $matches as $match ) {
-				$icons[ $name . '-' . $match[1] ] = $match[2];
-			}
-
-			return $icons;
-
 		}
+
+		$icons = array();
+
+		preg_match_all( "/\.\w*?\-(.*?):\w*?\s*?{?\s*?{\s*?\w*?:\s*?\'\\\\?(\w*?)\'.*?}/", $css_source, $matches, PREG_SET_ORDER, 0 );
+		foreach ( $matches as $match ) {
+			$icons[ $name . '-' . $match[1] ] = $match[2];
+		}
+
+		return $icons;
+
+	}
 
 
 		/**
@@ -460,31 +462,33 @@ class ECIcons {
 		 * @param string $url
 		 * @return array $icons
 		 */
-		protected function parse_css_reverse( $css_file, $name, $url ) {
+	protected function parse_css_reverse( $css_file, $name, $url ) {
 
-			/**
-			if ( ! file_exists( $css_file ) ) {
+		/**
+		if ( ! file_exists( $css_file ) ) {
+			return null;
+		}
+		**/
+
+		$css_source = @file_get_contents( $css_file );
+
+		if ( $css_source === false ) {
+			$css_source = @file_get_contents( $url );
+			if ( $css_source === false ) {
 				return null;
 			}
-			**/
-
-			$css_source = @file_get_contents( $css_file );
-
-			if ( $css_source === false ) {
-				$css_source = @file_get_contents( $url );
-				if ( $css_source === false ) return null;
-			}
-
-			$icons = array();
-
-			preg_match_all( "/\.\w*?\-(.*?):\w*?\s*?{?\s*?{\s*?\w*?:\s*?\'\\\\?(\w*?)\'.*?}/", $css_source, $matches, PREG_SET_ORDER, 0 );
-			foreach ( $matches as $match ) {
-				$icons['eci ' . $name . '-' . $match[1] ] = $match[1];
-			}
-
-			return $icons;
-
 		}
+
+		$icons = array();
+
+		preg_match_all( "/\.\w*?\-(.*?):\w*?\s*?{?\s*?{\s*?\w*?:\s*?\'\\\\?(\w*?)\'.*?}/", $css_source, $matches, PREG_SET_ORDER, 0 );
+		foreach ( $matches as $match ) {
+			$icons[ 'eci ' . $name . '-' . $match[1] ] = $match[1];
+		}
+
+		return $icons;
+
+	}
 
 
 		/**
@@ -493,23 +497,23 @@ class ECIcons {
 		 * @param string $dir
 		 * @return void
 		 */
-		protected function rrmdir( $dir ) {
+	protected function rrmdir( $dir ) {
 
-			if ( is_dir( $dir ) ) {
-				$objects = scandir( $dir );
-				foreach ( $objects as $object ) {
-					if ( $object != "." && $object != ".." ) {
-						if ( is_dir( $dir . "/" . $object ) ) {
-							$this->rrmdir( $dir . "/" . $object );
-						} else {
-							unlink( $dir . "/" . $object );
-						}
+		if ( is_dir( $dir ) ) {
+			$objects = scandir( $dir );
+			foreach ( $objects as $object ) {
+				if ( $object != '.' && $object != '..' ) {
+					if ( is_dir( $dir . '/' . $object ) ) {
+						$this->rrmdir( $dir . '/' . $object );
+					} else {
+						unlink( $dir . '/' . $object );
 					}
 				}
-				rmdir( $dir );
 			}
-
+			rmdir( $dir );
 		}
+
+	}
 
 		/**
 		 * @param string $name
@@ -518,16 +522,16 @@ class ECIcons {
 		 *
 		 * @return bool|string
 		 */
-		protected function getRequest( $name, $default = false, $type = 'POST' ) {
+	protected function getRequest( $name, $default = false, $type = 'POST' ) {
 
-			$TYPE = ( strtolower( $type ) == 'post' ) ? $_POST : $_GET;
-			if ( ! empty( $TYPE[ $name ] ) ) {
-				return sanitize_text_field( $TYPE[ $name ] );
-			}
-
-			return $default;
-
+		$TYPE = ( strtolower( $type ) == 'post' ) ? $_POST : $_GET;
+		if ( ! empty( $TYPE[ $name ] ) ) {
+			return sanitize_text_field( $TYPE[ $name ] );
 		}
+
+		return $default;
+
+	}
 
 }
 

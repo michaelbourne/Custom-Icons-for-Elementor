@@ -9,8 +9,8 @@
 * @since     0.1.0
 */
 
-if( ! defined( 'ABSPATH' ) ) {
-    return;
+if ( ! defined( 'ABSPATH' ) ) {
+	return;
 }
 
 class MergeCss_ECIcons extends ECIcons {
@@ -26,7 +26,6 @@ class MergeCss_ECIcons extends ECIcons {
 	private function generate_css() {
 
 		$options = get_option( 'ec_icons_fonts' );
-
 
 		$css_content = "i.eci { 
 			display: block;
@@ -47,10 +46,10 @@ class MergeCss_ECIcons extends ECIcons {
     		display: inline-block;
     		font-size: 18px;
 		}\n";
-		if ( !empty( $options ) && is_array($options) ) {
+		if ( ! empty( $options ) && is_array( $options ) ) {
 			foreach ( $options as $key => $font ) {
 
-				if ( isset( $font['status'] ) && $font['status'] !== '1' ){
+				if ( isset( $font['status'] ) && $font['status'] !== '1' ) {
 					continue;
 				}
 
@@ -58,33 +57,33 @@ class MergeCss_ECIcons extends ECIcons {
 					continue;
 				}
 
-				$font_data = json_decode($font['data'],true);
+				$font_data = json_decode( $font['data'], true );
 
-				if ( isset($font_data['nameempty']) && $font_data['nameempty'] == true ){
+				if ( isset( $font_data['nameempty'] ) && $font_data['nameempty'] == true ) {
 					$fontfilename = 'fontello';
 				} else {
 					$fontfilename = strtolower( $font_data['name'] );
 				}
 
-				$randomver = mt_rand();
+				$randomver    = mt_rand();
 				$css_content .= "@font-face {
 						 font-family: '" . strtolower( $font_data['name'] ) . "';
-						  src: url('" . $font_data['font_url'] . "/" . $fontfilename  . ".eot?" . $randomver . "');
-						  src: url('" . $font_data['font_url'] . "/" . $fontfilename  . ".eot?" . $randomver . "#iefix') format('embedded-opentype'),
-						       url('" . $font_data['font_url'] . "/" . $fontfilename  . ".woff2?" . $randomver . "') format('woff2'),
-						       url('" . $font_data['font_url'] . "/" . $fontfilename  . ".woff?" . $randomver . "') format('woff'),
-						       url('" . $font_data['font_url'] . "/" . $fontfilename  . ".ttf?" . $randomver . "') format('truetype'),
-						       url('" . $font_data['font_url'] . "/" . $fontfilename  . ".svg?" . $randomver . "#" . $fontfilename  . "') format('svg');
+						  src: url('" . $font_data['font_url'] . '/' . $fontfilename . '.eot?' . $randomver . "');
+						  src: url('" . $font_data['font_url'] . '/' . $fontfilename . '.eot?' . $randomver . "#iefix') format('embedded-opentype'),
+						       url('" . $font_data['font_url'] . '/' . $fontfilename . '.woff2?' . $randomver . "') format('woff2'),
+						       url('" . $font_data['font_url'] . '/' . $fontfilename . '.woff?' . $randomver . "') format('woff'),
+						       url('" . $font_data['font_url'] . '/' . $fontfilename . '.ttf?' . $randomver . "') format('truetype'),
+						       url('" . $font_data['font_url'] . '/' . $fontfilename . '.svg?' . $randomver . '#' . $fontfilename . "') format('svg');
 						  font-weight: normal;
 						  font-style: normal;
 						}\n";
 
 				$icons = $this->parse_css( $font_data['css_root'], $font_data['name'], $font_data['css_url'] );
 
-				if (!empty($icons) && is_array($icons)){
+				if ( ! empty( $icons ) && is_array( $icons ) ) {
 
 					foreach ( $icons as $name_icon => $code ) {
-						$css_content .= ".eci." . $name_icon . "::before { content: '\\" . $code . "'; font-family: '" . strtolower( $font_data['name'] ) . "'; }\n";
+						$css_content .= '.eci.' . $name_icon . "::before { content: '\\" . $code . "'; font-family: '" . strtolower( $font_data['name'] ) . "'; }\n";
 
 					}
 				}
@@ -95,7 +94,7 @@ class MergeCss_ECIcons extends ECIcons {
 		}
 
 		$css_content = preg_replace( '/\t+/', '', $css_content );
-		if ( is_dir( $this->upload_dir  ) ) {
+		if ( is_dir( $this->upload_dir ) ) {
 			file_put_contents( $this->upload_dir . '/merged-icons-font.css', $css_content );
 			update_option( 'eci_css_timestamp', time(), true );
 		}
@@ -108,10 +107,10 @@ class MergeCss_ECIcons extends ECIcons {
 
 		$options = get_option( 'ec_icons_fonts' );
 
-		if ( !empty( $options ) && is_array($options) ) {
+		if ( ! empty( $options ) && is_array( $options ) ) {
 			foreach ( $options as $key => $font ) {
 
-				if ( isset( $font['status'] ) && $font['status'] !== '1' ){
+				if ( isset( $font['status'] ) && $font['status'] !== '1' ) {
 					continue;
 				}
 
@@ -119,13 +118,13 @@ class MergeCss_ECIcons extends ECIcons {
 					continue;
 				}
 
-				$font_data = json_decode($font['data'],true);
+				$font_data = json_decode( $font['data'], true );
 
 				$icons = $this->parse_css( $font_data['css_root'], $font_data['name'], $font_data['css_url'] );
 
-				if (!empty($icons) && is_array($icons)){
+				if ( ! empty( $icons ) && is_array( $icons ) ) {
 
-					$json = [];
+					$json          = [];
 					$json['icons'] = [];
 
 					foreach ( $icons as $name_icon => $code ) {
@@ -134,13 +133,11 @@ class MergeCss_ECIcons extends ECIcons {
 					}
 				}
 
-				if ( is_dir( $this->upload_dir  ) ) {
-					file_put_contents( $this->upload_dir . '/' . $font_data['name'] . '.json', json_encode($json) );
+				if ( is_dir( $this->upload_dir ) ) {
+					file_put_contents( $this->upload_dir . '/' . $font_data['name'] . '.json', json_encode( $json ) );
 				}
-
 			}
 		}
-
 
 	}
 
