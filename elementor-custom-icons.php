@@ -427,19 +427,17 @@ class ECIcons {
 		 */
 	protected function parse_css( $css_file, $name, $url ) {
 
-		/**
-		if ( ! file_exists( $css_file ) ) {
-			return null;
-		}
-		**/
-
 		$css_source = @file_get_contents( $css_file );
 
 		if ( $css_source === false ) {
-			$css_source = @file_get_contents( $url );
-			if ( $css_source === false ) {
+			$response = wp_remote_get( $url );
+
+			if ( is_array( $response ) && ! is_wp_error( $response ) ) {
+			    $css_source = $response['body'];
+			} else {
 				return null;
 			}
+
 		}
 
 		$icons = array();
@@ -464,19 +462,17 @@ class ECIcons {
 		 */
 	protected function parse_css_reverse( $css_file, $name, $url ) {
 
-		/**
-		if ( ! file_exists( $css_file ) ) {
-			return null;
-		}
-		**/
-
 		$css_source = @file_get_contents( $css_file );
 
 		if ( $css_source === false ) {
-			$css_source = @file_get_contents( $url );
-			if ( $css_source === false ) {
+			$response = wp_remote_get( $url );
+
+			if ( is_array( $response ) && ! is_wp_error( $response ) ) {
+			    $css_source = $response['body'];
+			} else {
 				return null;
 			}
+
 		}
 
 		$icons = array();
@@ -498,6 +494,8 @@ class ECIcons {
 		 * @return void
 		 */
 	protected function rrmdir( $dir ) {
+
+		if ( ! current_user_can( 'manage_options' ) ) return;
 
 		if ( is_dir( $dir ) ) {
 			$objects = scandir( $dir );
