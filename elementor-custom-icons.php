@@ -46,7 +46,7 @@ class ECIcons {
 	 *
 	 * @var $prefix
 	 */
-	private $prefix;
+	public $prefix;
 
 	/**
 	 * Path upload folder
@@ -60,21 +60,14 @@ class ECIcons {
 	 *
 	 * @var $upload_url
 	 */
-	private $upload_url;
-
-	/**
-	 * uploads folder name
-	 *
-	 * @var $upload_dir_single
-	 */
-	private $upload_dir_single;
+	public $upload_url;
 
 	/**
 	 * Prefix for custom icons
 	 *
 	 * @var $prefix_icon
 	 */
-	private $prefix_icon;
+	public $prefix_icon;
 
 	/**
 	 * Constructor.
@@ -105,7 +98,7 @@ class ECIcons {
 
 		// load icons
 		add_action( 'elementor/controls/controls_registered', array( $this, 'icons_filters' ), 100, 1 );
-		add_filter( 'elementor/icons_manager/additional_tabs', array( $this, 'icons_filters_new' ), 100, 1 );
+		add_filter( 'elementor/icons_manager/additional_tabs', array( $this, 'icons_filters_new' ), 9999999, 1 );
 
 		// Provide developer filter to remove FA icons from selectors
 		if ( apply_filters( 'eci_drop_fa', false ) ) {
@@ -121,7 +114,6 @@ class ECIcons {
 		$this->prefix_icon = 'efs-';
 		$this->upload_dir  = $upload['basedir'] . '/' . ECIcons_UPLOAD;
 		$this->upload_url  = $upload['baseurl'] . '/' . ECIcons_UPLOAD;
-		//$this->upload_dir_single = str_replace( get_option('siteurl'), '', $this->upload_url );
 
 		// set plugin version
 		$this->version = '0.3';
@@ -135,11 +127,11 @@ class ECIcons {
 		add_action( 'plugins_loaded', array( $this, 'eci_load_textdomain' ) );
 	}
 
-		/**
-		 * Get the instance of ECIcons Plugins
-		 *
-		 * @return self
-		 */
+	/**
+	 * Get the instance of ECIcons Plugins
+	 *
+	 * @return self
+	 */
 	public static function getInstance() {
 
 		if ( ! ( self::$_instance instanceof self ) ) {
@@ -150,18 +142,18 @@ class ECIcons {
 
 	}
 
-		/**
-		 * @param mixed $instance
-		 */
+	/**
+	 * @param mixed $instance
+	 */
 	public static function setInstance( $instance ) {
 
 		self::$_instance = $instance;
 
 	}
 
-		/**
-		 * Init main functions (for hook admin_init)
-		 */
+	/**
+	 * Init main functions (for hook admin_init)
+	 */
 	public function admin_init() {
 
 		$this->settings_init();
@@ -171,16 +163,16 @@ class ECIcons {
 
 	}
 
-		/**
-		 * Internationalization
-		 */
+	/**
+	 * Internationalization
+	 */
 	public function eci_load_textdomain() {
 		load_plugin_textdomain( 'custom-icons-for-elementor', false, dirname( plugin_basename( __FILE__ ) ) . '/languages/' );
 	}
 
-		/**
-		 * Add new pages to admin
-		 */
+	/**
+	 * Add new pages to admin
+	 */
 	public function add_admin_menu() {
 
 		add_submenu_page(
@@ -197,9 +189,9 @@ class ECIcons {
 
 	}
 
-		/**
-		 * Render all options
-		 */
+	/**
+	 * Render all options
+	 */
 	public function options_page() {
 
 		include_once 'includes/template.options.page.php';
@@ -207,9 +199,9 @@ class ECIcons {
 	}
 
 
-		/**
-		 * ECIcons settings init
-		 */
+	/**
+	 * ECIcons settings init
+	 */
 	protected function settings_init() {
 
 		register_setting( $this->prefix . 'fontellos_page', $this->prefix . 'elementor_icons_settings' );
@@ -218,9 +210,9 @@ class ECIcons {
 	}
 
 
-		/**
-		 * Enqueue admin scripts
-		 */
+	/**
+	 * Enqueue admin scripts
+	 */
 	public function admin_enqueue_scripts() {
 
 		wp_enqueue_style( 'elementor-custom-icons-css', ECIcons_URI . 'assets/css/elementor-custom-icons.css', array(), ECIcons_VERSION );
@@ -244,9 +236,9 @@ class ECIcons {
 
 	}
 
-		/**
-		 * Enqueue public scripts
-		 */
+	/**
+	 * Enqueue public scripts
+	 */
 	public function enqueue_scripts() {
 
 		if ( file_exists( $this->upload_dir . '/merged-icons-font.css' ) ) {
@@ -259,10 +251,10 @@ class ECIcons {
 
 	}
 
-		/**
-		 * Add custom font CSS to footer so it actually works in the builder
-		 * - to do: get this working with the builder boilerplate action
-		 */
+	/**
+	 * Add custom font CSS to footer so it actually works in the builder
+	 * - to do: get this working with the builder boilerplate action
+	 */
 	public function insert_footer_css() {
 
 		if ( current_user_can( 'manage_options' ) ) {
@@ -274,16 +266,17 @@ class ECIcons {
 					$modtime = mt_rand(); }
 				echo '<link rel="stylesheet" type="text/css" href="' . $this->upload_url . '/merged-icons-font.css?ver=' . $modtime . '">';
 			}
+
 		}
 
 	}
 
-		/**
-		 * Get uploaded font package's config file
-		 *
-		 * @param string $file_name
-		 * @return array $data
-		 */
+	/**
+	 * Get uploaded font package's config file
+	 *
+	 * @param string $file_name
+	 * @return array $data
+	 */
 	public function get_config_font( $file_name ) {
 
 		$file_config = glob( $this->upload_dir . '/' . $file_name . '/*/*' );
@@ -331,12 +324,12 @@ class ECIcons {
 
 	}
 
-		/**
-		 * Add custom icons to Elementor registry
-		 *
-		 * @param object $controls_registry
-		 * @return void
-		 */
+	/**
+	 * Add custom icons to Elementor registry
+	 *
+	 * @param object $controls_registry
+	 * @return void
+	 */
 	public function icons_filters( $controls_registry ) {
 
 		// Get existing icons
@@ -372,13 +365,13 @@ class ECIcons {
 	}
 
 
-		/**
-		 * Add custom icons to Elementor Icons tabs (new in v2.6+)
-		 *
-		 * @param array $tabs Additional tabs for new icon interface.
-		 * @return array $tabs
-		 */
-	public function icons_filters_new( $tabs ) {
+	/**
+	 * Add custom icons to Elementor Icons tabs (new in v2.6+)
+	 *
+	 * @param array $tabs Additional tabs for new icon interface.
+	 * @return array $tabs
+	 */
+	public function icons_filters_new( $tabs = array() ) {
 
 		// get loaded icon files
 		$options = get_option( 'ec_icons_fonts' );
@@ -417,14 +410,14 @@ class ECIcons {
 
 
 
-		/**
-		 * Parse CSS file to get proper icon names
-		 *
-		 * @param string $css_file
-		 * @param string $name
-		 * @param string $url
-		 * @return array $icons
-		 */
+	/**
+	 * Parse CSS file to get proper icon names
+	 *
+	 * @param string $css_file
+	 * @param string $name
+	 * @param string $url
+	 * @return array $icons
+	 */
 	protected function parse_css( $css_file, $name, $url ) {
 
 		$css_source = @file_get_contents( $css_file );
@@ -452,14 +445,14 @@ class ECIcons {
 	}
 
 
-		/**
-		 * Parse CSS file to get proper icon names (reverse parse)
-		 *
-		 * @param string $css_file
-		 * @param string $name
-		 * @param string $url
-		 * @return array $icons
-		 */
+	/**
+	 * Parse CSS file to get proper icon names (reverse parse)
+	 *
+	 * @param string $css_file
+	 * @param string $name
+	 * @param string $url
+	 * @return array $icons
+	 */
 	protected function parse_css_reverse( $css_file, $name, $url ) {
 
 		$css_source = @file_get_contents( $css_file );
@@ -487,12 +480,12 @@ class ECIcons {
 	}
 
 
-		/**
-		 * remove folder (recursive)
-		 *
-		 * @param string $dir
-		 * @return void
-		 */
+	/**
+	 * remove folder (recursive)
+	 *
+	 * @param string $dir
+	 * @return void
+	 */
 	protected function rrmdir( $dir ) {
 
 		if ( ! current_user_can( 'manage_options' ) ) return;
@@ -513,13 +506,13 @@ class ECIcons {
 
 	}
 
-		/**
-		 * @param string $name
-		 * @param bool   $default
-		 * @param string $type
-		 *
-		 * @return bool|string
-		 */
+	/**
+	 * @param string $name
+	 * @param bool   $default
+	 * @param string $type
+	 *
+	 * @return bool|string
+	 */
 	protected function getRequest( $name, $default = false, $type = 'POST' ) {
 
 		$TYPE = ( strtolower( $type ) == 'post' ) ? $_POST : $_GET;

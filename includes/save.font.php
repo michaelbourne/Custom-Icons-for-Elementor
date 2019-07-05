@@ -152,7 +152,8 @@ class SaveFont_ECIcons extends ECIcons {
 			unset( $options[ $file_name ] );
 
 			// remove file
-			$this->rrmdir( $this->upload_dir . '/' . $data['file_name'] );
+			$this->rrmdir( ec_icons_manager()->upload_dir . '/' . $data['file_name'] );
+			unlink( ec_icons_manager()->upload_dir . '/' . $data['name'] . '.json' );
 
 			$result = array(
 				'name'        => $file_name,
