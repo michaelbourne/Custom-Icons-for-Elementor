@@ -202,6 +202,8 @@ class SaveFont_ECIcons extends ECIcons {
 
 				$font_data = $this->get_config_font( $font_decode['file_name'] );
 
+				if ( ! $font_data ) continue;
+
 				$newoptions[ $font_data['name'] ] = array(
 					'status' => '1',
 					'data'   => json_encode( $font_data ),

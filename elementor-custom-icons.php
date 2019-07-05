@@ -279,6 +279,8 @@ class ECIcons {
 	 */
 	public function get_config_font( $file_name ) {
 
+		if ( ! is_dir( $this->upload_dir . '/' . $file_name ) ) return false;
+
 		$file_config = glob( $this->upload_dir . '/' . $file_name . '/*/*' );
 		$data        = array();
 		$css_folder  = '';

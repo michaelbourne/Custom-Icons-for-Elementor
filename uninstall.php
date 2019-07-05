@@ -38,6 +38,9 @@ if ( !empty( $options ) && is_array($options) ) {
 		$font_decode = json_decode($font['data'],true);
 
 		ecicons_rrmdir( $upload_dir . '/' . $font_decode['file_name'] );
+		if ( file_exists( $upload_dir . '/' . $font_decode['name'] . '.json' ) ) {
+			unlink( $upload_dir . '/' . $font_decode['name'] . '.json' );
+		}
 
 	}
 
