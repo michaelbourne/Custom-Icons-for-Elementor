@@ -2,7 +2,7 @@
 /*
 Plugin Name: Custom Icons for Elementor
 Description: Add custom icon fonts to the built in Elementor controls
-Version:     0.3
+Version:     0.3.1
 Author:      Michael Bourne
 Author URI:  https://michaelbourne.ca
 License:     GPL3
@@ -29,7 +29,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 defined( 'ECIcons_ROOT' ) or define( 'ECIcons_ROOT', dirname( __FILE__ ) );
 defined( 'ECIcons_URI' ) or define( 'ECIcons_URI', plugin_dir_url( __FILE__ ) );
-defined( 'ECIcons_VERSION' ) or define( 'ECIcons_VERSION', '0.3' );
+defined( 'ECIcons_VERSION' ) or define( 'ECIcons_VERSION', '0.3.1' );
 defined( 'ECIcons_UPLOAD' ) or define( 'ECIcons_UPLOAD', 'elementor_icons_files' );
 
 class ECIcons {
@@ -116,7 +116,7 @@ class ECIcons {
 		$this->upload_url  = $upload['baseurl'] . '/' . ECIcons_UPLOAD;
 
 		// set plugin version
-		$this->version = '0.3';
+		$this->version = '0.3.1';
 
 		// SSL fix because WordPress core function wp_upload_dir() doesn't check protocol.
 		if ( is_ssl() ) {
@@ -379,7 +379,7 @@ class ECIcons {
 		$options = get_option( 'ec_icons_fonts' );
 
 		if ( empty( $options ) ) {
-			return;
+			return $tabs;
 		}
 
 		$newicons = [];

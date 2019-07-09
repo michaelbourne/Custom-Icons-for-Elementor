@@ -41,6 +41,9 @@ There is a small, small chance this plugin may not work on your web host. This i
 
 ### Changelog
 
+**0.3.1**
+* Small fix for Elementor 2.6
+
 **0.3**
 * Added support for the new Elementor v2.6+ icons manager
 * Fixed query string parameter on backend to prevent collisions with other plugins
