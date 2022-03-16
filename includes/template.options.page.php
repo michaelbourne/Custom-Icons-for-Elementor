@@ -21,6 +21,22 @@ $options = get_option( 'ec_icons_fonts' );
 		<div class="eci-main">
 			<div class="eci-row">
 				<div class="eci-column">
+					<div class="eci-box eci-box-min-height">
+
+							<header class="eci-box-header">
+								<h2 class="eci-box-title"><?php esc_html_e( 'End Of Life Notice', 'custom-icons-for-elementor' ); ?></h2>
+							</header>
+
+							<div class="eci-box-content">
+								<p><?php esc_html_e( 'This plugin has proudly enabled nearly 100,000 websites to use custom icons inside of Elementor. We may have pioneered that feature, but it was popular enough that Elementor added their won equal functionality. Such is the way with WordPress add-ons. Their version is the method you should be using on your websites moving forward, in order to ensure compatibility. I\'ve been requesting users migrate to their system for over a year now, and it\'s finally time to put this plugin to rest. Thank you all for using it, and I wish you the best moving forward.', 'custom-icons-for-elementor' ); ?></p>
+								<p><strong>This plugin will be removed from the repo on January 1, 2021</strong></p>
+							</div>
+
+					</div>
+				</div>
+			</div>
+			<div class="eci-row">
+				<div class="eci-column">
 					<div class="eci-box">
 
 						<header class="eci-box-header">

@@ -1,14 +1,18 @@
 <?php
 /*
-Plugin Name: Custom Icons for Elementor
-Description: Add custom icon fonts to the built in Elementor controls
-Version:     0.3.1
-Author:      Michael Bourne
-Author URI:  https://michaelbourne.ca
-License:     GPL3
-License URI: https://www.gnu.org/licenses/gpl-3.0.en.html
-Text Domain: custom-icons-for-elementor
-Domain Path: /languages
+Plugin Name:       Custom Icons for Elementor
+Description:       Add custom icon fonts to the built in Elementor controls
+Version:           0.3.1
+Author:            Michael Bourne
+Author URI:        https://michaelbourne.ca
+License:           GPL3
+Requires at least: 5.3
+Tested up to:      5.5
+Stable tag:        0.3.1
+Requires PHP:      7.2
+License URI:       https://www.gnu.org/licenses/gpl-3.0.en.html
+Text Domain:       custom-icons-for-elementor
+Domain Path:       /languages
 */
 /*
 Custom Icons for Elementor is a plugin for WordPress that enables you to add custom icon fonts to the built in Elementor controls.

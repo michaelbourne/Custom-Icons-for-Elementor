@@ -3,7 +3,7 @@ Contributors: michaelbourne
 Donate link: https://www.paypal.me/yycpro
 Tags: elementor, icons, fontello, icon fonts
 Requires at least: 4.5
-Tested up to: 5.2.1
+Tested up to: 5.5
 Stable tag: 0.3.1
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.en.html
