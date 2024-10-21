@@ -30,7 +30,7 @@ class SaveFont_ECIcons extends ECIcons {
 	 */
 	public function init() {
 
-		$action = $this->getRequest( 'action' );
+		$action = $this->getRequest( 'eci_action' );
 
 		// ajax events.
 		if ( ! empty( $action ) && is_callable( array( $this, $action ) ) ) {
