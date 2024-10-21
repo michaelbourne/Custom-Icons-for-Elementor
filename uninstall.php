@@ -13,11 +13,12 @@ function ecicons_rrmdir( $dir ) {
 				if ( is_dir( $dir . "/" . $object ) ) {
 					ecicons_rrmdir( $dir . "/" . $object );
 				} else {
-					unlink( $dir . "/" . $object );
+					wp_delete_file( $dir . "/" . $object );
 				}
 			}
 		}
-		rmdir( $dir );
+		global $wp_filesystem;
+		$wp_filesystem->rmdir( $dir, true );
 	}
 
 }
@@ -39,11 +40,11 @@ if ( !empty( $options ) && is_array($options) ) {
 
 		ecicons_rrmdir( $upload_dir . '/' . $font_decode['file_name'] );
 		if ( file_exists( $upload_dir . '/' . $font_decode['name'] . '.json' ) ) {
-			unlink( $upload_dir . '/' . $font_decode['name'] . '.json' );
+			wp_delete_file( $upload_dir . '/' . $font_decode['name'] . '.json' );
 		}
 
 	}
 
 }
-unlink( $upload_dir . '/merged-icons-font.css');
+wp_delete_file( $upload_dir . '/merged-icons-font.css');
 delete_option('ec_icons_fonts');

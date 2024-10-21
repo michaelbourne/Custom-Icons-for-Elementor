@@ -1,20 +1,33 @@
 <?php
 /**
-* Class for merging CSS from all uploaded fonts
-*
-* @package   Elementor Custom icons
-* @author    Michael Bourne
-* @license   GPL3
-* @link      https://ursa6.com
-* @since     0.1.0
-*/
+ * Class for merging CSS from all uploaded fonts
+ *
+ * @package   Elementor Custom icons
+ * @author    Michael Bourne
+ * @license   GPL3
+ * @link      https://ursa6.com
+ * @since     0.1.0
+ */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	return;
 }
 
+/**
+ * Class MergeCss_ECIcons
+ *
+ * This class extends the ECIcons class and is responsible for merging CSS files.
+ *
+ * @package custom-icons-for-elementor
+ * @subpackage includes
+ */
 class MergeCss_ECIcons extends ECIcons {
 
+	/**
+	 * Constructor for the class.
+	 *
+	 * This method initializes the class and sets up any necessary properties or methods.
+	 */
 	public function __construct() {
 		$this->generate_css();
 		$this->generate_json();
@@ -49,7 +62,7 @@ class MergeCss_ECIcons extends ECIcons {
 		if ( ! empty( $options ) && is_array( $options ) ) {
 			foreach ( $options as $key => $font ) {
 
-				if ( isset( $font['status'] ) && $font['status'] !== '1' ) {
+				if ( isset( $font['status'] ) && '1' !== $font['status'] ) {
 					continue;
 				}
 
@@ -59,13 +72,13 @@ class MergeCss_ECIcons extends ECIcons {
 
 				$font_data = json_decode( $font['data'], true );
 
-				if ( isset( $font_data['nameempty'] ) && $font_data['nameempty'] == true ) {
+				if ( isset( $font_data['nameempty'] ) && true == $font_data['nameempty'] ) {
 					$fontfilename = 'fontello';
 				} else {
 					$fontfilename = strtolower( $font_data['name'] );
 				}
 
-				$randomver    = mt_rand();
+				$randomver    = wp_rand();
 				$css_content .= "@font-face {
 						 font-family: '" . strtolower( $font_data['name'] ) . "';
 						  src: url('" . $font_data['font_url'] . '/' . $fontfilename . '.eot?' . $randomver . "');
@@ -94,11 +107,18 @@ class MergeCss_ECIcons extends ECIcons {
 		}
 
 		$css_content = preg_replace( '/\t+/', '', $css_content );
-		if ( is_dir( ec_icons_manager()->upload_dir ) ) {
-			file_put_contents( ec_icons_manager()->upload_dir . '/merged-icons-font.css', $css_content );
+		if ( is_dir( (string) ec_icons_manager()->upload_dir ) ) {
+			global $wp_filesystem;
+			if ( ! function_exists( 'WP_Filesystem' ) ) {
+				require_once ABSPATH . 'wp-admin/includes/file.php';
+			}
+			WP_Filesystem();
+			$wp_filesystem->put_contents( ec_icons_manager()->upload_dir . '/merged-icons-font.css', $css_content );
 			update_option( 'eci_css_timestamp', time(), true );
 		} else {
-			error_log('error saving css file to: ' . ec_icons_manager()->upload_dir);
+			if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+				error_log( 'Error saving Fontello CSS file to: ' . ec_icons_manager()->upload_dir );
+			}
 		}
 	}
 
@@ -112,7 +132,7 @@ class MergeCss_ECIcons extends ECIcons {
 		if ( ! empty( $options ) && is_array( $options ) ) {
 			foreach ( $options as $key => $font ) {
 
-				if ( isset( $font['status'] ) && $font['status'] !== '1' ) {
+				if ( isset( $font['status'] ) && '1' !== $font['status'] ) {
 					continue;
 				}
 
@@ -126,8 +146,8 @@ class MergeCss_ECIcons extends ECIcons {
 
 				if ( ! empty( $icons ) && is_array( $icons ) ) {
 
-					$json          = [];
-					$json['icons'] = [];
+					$json          = array();
+					$json['icons'] = array();
 
 					foreach ( $icons as $name_icon => $code ) {
 						$json['icons'][] = $name_icon;
@@ -135,12 +155,15 @@ class MergeCss_ECIcons extends ECIcons {
 					}
 				}
 
-				if ( is_dir( ec_icons_manager()->upload_dir ) ) {
-					file_put_contents( ec_icons_manager()->upload_dir . '/' . $font_data['name'] . '.json', json_encode( $json ) );
+				if ( is_dir( (string) ec_icons_manager()->upload_dir ) ) {
+					global $wp_filesystem;
+					if ( ! function_exists( 'WP_Filesystem' ) ) {
+						require_once ABSPATH . 'wp-admin/includes/file.php';
+					}
+					WP_Filesystem();
+					$wp_filesystem->put_contents( ec_icons_manager()->upload_dir . '/' . $font_data['name'] . '.json', wp_json_encode( $json ) );
 				}
 			}
 		}
-
 	}
-
 }

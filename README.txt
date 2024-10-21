@@ -2,9 +2,9 @@
 Contributors: michaelbourne
 Donate link: https://www.paypal.me/yycpro
 Tags: elementor, icons, fontello, icon fonts
-Requires at least: 4.5
-Tested up to: 5.5
-Stable tag: 0.3.1
+Requires at least: 5.4
+Tested up to: 6.6.2
+Stable tag: 0.3.4
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.en.html
 
@@ -63,6 +63,15 @@ None yet
 
 == Changelog ==
 
+= 0.3.4 =
+* Fix: further restrict file uploads to parse out unused files.
+
+= 0.3.3 =
+* Fix: WP Plugin check recommendations
+
+= 0.3.2 =
+* Fix: Security issue if a malicious admin user is present on website.
+
 = 0.3.1 =
 * Small tweak for Elementor 2.6
 
@@ -114,6 +123,12 @@ None yet
 * Initial Public Version
 
 == Upgrade Notice ==
+
+= 0.3.3 =
+Security release.
+
+= 0.3.2 =
+Security fix.
 
 = 0.3.1 =
 Small fix for Elementor 2.6

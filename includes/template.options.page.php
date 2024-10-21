@@ -9,8 +9,8 @@
 * @since     0.1.0
 */
 
-if( ! defined( 'ABSPATH' ) ) {
-    return;
+if ( ! defined( 'ABSPATH' ) ) {
+  return;
 }
 
 $options = get_option( 'ec_icons_fonts' );
@@ -19,22 +19,6 @@ $options = get_option( 'ec_icons_fonts' );
 <div class="eci-reset eci-wrap eci-wrap-about">
 	<div class="eci-content">
 		<div class="eci-main">
-			<div class="eci-row">
-				<div class="eci-column">
-					<div class="eci-box eci-box-min-height">
-
-							<header class="eci-box-header">
-								<h2 class="eci-box-title"><?php esc_html_e( 'End Of Life Notice', 'custom-icons-for-elementor' ); ?></h2>
-							</header>
-
-							<div class="eci-box-content">
-								<p><?php esc_html_e( 'This plugin has proudly enabled nearly 100,000 websites to use custom icons inside of Elementor. We may have pioneered that feature, but it was popular enough that Elementor added their won equal functionality. Such is the way with WordPress add-ons. Their version is the method you should be using on your websites moving forward, in order to ensure compatibility. I\'ve been requesting users migrate to their system for over a year now, and it\'s finally time to put this plugin to rest. Thank you all for using it, and I wish you the best moving forward.', 'custom-icons-for-elementor' ); ?></p>
-								<p><strong>This plugin will be removed from the repo on January 1, 2021</strong></p>
-							</div>
-
-					</div>
-				</div>
-			</div>
 			<div class="eci-row">
 				<div class="eci-column">
 					<div class="eci-box">
@@ -53,10 +37,10 @@ $options = get_option( 'ec_icons_fonts' );
 										<h4 class="eci-box-content-title"><?php esc_html_e( 'Create a new Icon Font', 'custom-icons-for-elementor' ); ?></h4>
 										<span class="eci-box-content-text">
 										<?php
-											/* translators: Options page step 1. KSES set to a, br, and i.  */
 											echo sprintf( 
 												wp_kses( 
-													__( 'Visit <a href="%s" target="_blank">Fontello</a> and select the icons you would like to use. You can even upload custom SVG icons of your own on Fontello, whether they be custom made or from a source like <a href="%s" target="_blank">Flaticon!</a>', 'custom-icons-for-elementor' ), 
+													/* translators: Options page step 1. KSES set to a, br, and i.  */
+													__( 'Visit <a href="%1$s" target="_blank">Fontello</a> and select the icons you would like to use. You can even upload custom SVG icons of your own on Fontello, whether they be custom made or from a source like <a href="%2$s" target="_blank">Flaticon!</a>', 'custom-icons-for-elementor' ), 
 													array(  
 														'a' => array( 
 															'href' => array(),
@@ -96,9 +80,9 @@ $options = get_option( 'ec_icons_fonts' );
 										<h4 class="eci-box-content-title"><?php esc_html_e( 'Use Your Icons', 'custom-icons-for-elementor' ); ?></h4>
 										<span class="eci-box-content-text">
 										<?php
-											/* translators: Options page step 3. KSES set to a, br, and i.  */
 											echo sprintf( 
 												wp_kses( 
+													/* translators: Options page step 3. KSES set to a, br, and i.  */
 													__( 'You will now see your custom icons in all Elementor elements that have icon selectors in them.<br><br>Looking for more help? You can watch an instructional video by WPBuilders <a href="%s" target="_blank">here.</a>', 'custom-icons-for-elementor' ), 
 													array(  
 														'a' => array( 
@@ -213,7 +197,7 @@ $options = get_option( 'ec_icons_fonts' );
 										<div class="iconlist hide">
 											<?php
 											foreach($icons as $iconkey => $iconcode){
-												echo '<div><i class="eci ' . $iconkey . '" style="font-size: 16px; margin-right: 10px;"></i><span>' . $iconkey . '</span></div>';
+												echo '<div><i class="eci ' . esc_attr( $iconkey ) . '" style="font-size: 16px; margin-right: 10px;"></i><span>' . esc_html( $iconkey ) . '</span></div>';
 											}
 											?>
 										</div>
