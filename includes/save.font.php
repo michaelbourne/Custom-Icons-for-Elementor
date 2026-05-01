@@ -20,22 +20,24 @@ class SaveFont_ECIcons extends ECIcons {
 
 
 	/**
-	 * Initializes the class by setting up AJAX actions based on the request.
-	 *
-	 * This method retrieves the 'action' parameter from the request and checks if it corresponds
-	 * to a callable method within the class. If so, it registers the method as an AJAX action
-	 * using the 'wp_ajax_' hook.
+	 * Register AJAX handlers.
 	 *
 	 * @return void
 	 */
 	public function init() {
+		add_action( 'wp_ajax_' . ECICONS_ACTION_SAVE_FONT, array( $this, 'ec_icons_save_font' ) );
+		add_action( 'wp_ajax_' . ECICONS_ACTION_DELETE_FONT, array( $this, 'ec_icons_delete_font' ) );
+		add_action( 'wp_ajax_' . ECICONS_ACTION_REGENERATE_FONT, array( $this, 'ec_icons_regenerate' ) );
+	}
 
-		$action = $this->getRequest( 'eci_action' );
-
-		// ajax events.
-		if ( ! empty( $action ) && is_callable( array( $this, $action ) ) ) {
-			add_action( 'wp_ajax_' . $action, array( $this, $action ) );
-		}
+	/**
+	 * Validate nonce and capability for AJAX write endpoints.
+	 *
+	 * @return bool
+	 */
+	private function can_manage_icons() {
+		check_ajax_referer( 'ec_icons_nonce' );
+		return current_user_can( 'manage_options' );
 	}
 
 
@@ -50,132 +52,127 @@ class SaveFont_ECIcons extends ECIcons {
 	 * @return void
 	 */
 	public function ec_icons_save_font() {
-
-		if ( wp_verify_nonce( $this->getRequest( '_wpnonce' ), 'ec_icons_nonce' ) && current_user_can( 'manage_options' ) ) {
-
-			if ( ! class_exists( 'ZipArchive' ) ) {
-				$result['status_save'] = 'failedopen';
-				echo wp_json_encode( $result );
-				die();
-			}
-
-			$file_name = str_replace( '.zip', '', $this->getRequest( 'file_name', 'font' ) );
-
-			$result = array();
-
-			if (
-				! empty( $_FILES )
-				&& ! empty( $_FILES['source_file'] )
-				&& ! empty( $_FILES['source_file']['name'] )
-				&& ! empty( $_FILES['source_file']['tmp_name'] )
-			 ) {
-
-				// Sanitize file name
-				$sanitized_file_name = sanitize_file_name( $_FILES['source_file']['name'] );
-
-				// Check file type.
-				$file_type = wp_check_filetype( $sanitized_file_name );
-				if ( 'zip' !== $file_type['ext'] ) {
-						$result['status_save'] = 'invalidfiletype';
-						echo wp_json_encode( $result );
-						die();
-				}
-
-				// Validate the temporary file
-				$tmp_file = $_FILES['source_file']['tmp_name'];
-				if ( ! is_uploaded_file( $tmp_file ) ) {
-						$result['status_save'] = 'invalidfile';
-						echo wp_json_encode( $result );
-						die();
-				}
-
-				$zip = new ZipArchive();
-				$res = $zip->open( $tmp_file );
-
-				if ( true === $res ) {
-					$allowed_extensions = array( 'eot', 'svg', 'ttf', 'woff', 'woff2', 'css', 'json' );
-					$extract_dir        = $this->upload_dir . '/' . sanitize_file_name( $file_name );
-
-					if ( ! is_dir( $extract_dir ) ) {
-						mkdir( $extract_dir, 0755, true );
-					}
-
-					for ( $i = 0; $i < $zip->numFiles; $i++ ) {
-						$stat             = $zip->statIndex( $i );
-						$file_name_in_zip = $stat['name'];
-						$file_extension   = strtolower( pathinfo( $file_name_in_zip, PATHINFO_EXTENSION ) );
-
-						// Skip unsupported files
-						if ( ! in_array( $file_extension, $allowed_extensions, true ) ) {
-							continue;
-						}
-
-						// Generate the target path, keeping the original folder structure
-						$relative_path = ltrim( $file_name_in_zip, '/' ); // Remove leading slashes
-						$target_path   = $extract_dir . '/' . $relative_path;
-
-						// Create the directory structure if it doesn't exist
-						$target_dir = dirname( $target_path );
-						if ( ! is_dir( $target_dir ) ) {
-							mkdir( $target_dir, 0755, true );
-						}
-
-						// Ensure no path traversal (the extracted path should stay within the intended directory)
-						if ( strpos( realpath( $target_dir ), realpath( $extract_dir ) ) === 0 ) {
-							// Copy the file to the target location
-							if ( ! copy( 'zip://' . $tmp_file . '#' . $file_name_in_zip, $target_path ) ) {
-								$result['status_save'] = 'failedcopy';
-								echo wp_json_encode( $result );
-								die();
-							}
-							chmod( $target_path, 0644 ); // Secure file permissions
-						}
-					}
-
-					$zip->close();
-
-					// Verify if any files were extracted successfully
-					if ( count( glob( $extract_dir . '/*', GLOB_NOSORT ) ) === 0 ) {
-						$result['status_save'] = 'failedextract';
-						echo wp_json_encode( $result );
-						die();
-					}
-				} else {
-					$result['status_save'] = 'failedopen';
-					echo wp_json_encode( $result );
-					die();
-				}
-
-				$font_data = $this->get_config_font( $file_name );
-
-				$icons = $this->parse_css( $font_data['css_root'], $font_data['name'], $font_data['css_url'] );
-
-				if ( ! empty( $icons ) && is_array( $icons ) ) {
-					$result['count_icons'] = count( $icons );
-					$first_icon            = ! empty( $icons ) ? key( $icons ) : '';
-					$result['first_icon']  = $first_icon;
-					$iconlist              = '';
-					foreach ( $icons as $iconkey => $iconcode ) {
-						$iconlist .= '<div><i class="eci ' . esc_attr( $iconkey ) . '" style="font-size: 16px;"></i><span>' . esc_html( $iconkey ) . '</span></div>';
-					}
-					$result['iconlist'] = $iconlist;
-
-					$result['name']        = $font_data['name'];
-					$result['status_save'] = $this->update_options( $font_data, '1' );
-					$result['data']        = $font_data;
-
-					new MergeCss_ECIcons();
-				} else {
-					$result['status_save'] = 'emptyfile';
-				}
-			} else {
-				$result['status_save'] = 'emptyfile';
-			}
-
-			echo wp_json_encode( $result );
+		if ( ! $this->can_manage_icons() ) {
+			wp_send_json_error( array( 'status_save' => 'invalid_permissions' ) );
 		}
 
-		die();
+		if ( ! class_exists( 'ZipArchive' ) ) {
+			wp_send_json_error( array( 'status_save' => 'failedopen' ) );
+		}
+
+		$file_name = str_replace( '.zip', '', $this->get_request( 'file_name', 'font' ) );
+		$file_name = sanitize_file_name( $file_name );
+
+		if (
+			// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce validated in can_manage_icons().
+			empty( $_FILES )
+			// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce validated in can_manage_icons().
+			|| empty( $_FILES['source_file'] )
+			// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce validated in can_manage_icons().
+			|| empty( $_FILES['source_file']['name'] )
+			// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce validated in can_manage_icons().
+			|| empty( $_FILES['source_file']['tmp_name'] )
+		) {
+			wp_send_json_error( array( 'status_save' => 'emptyfile' ) );
+		}
+
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce validated in can_manage_icons().
+		$sanitized_file_name = sanitize_file_name( wp_unslash( (string) $_FILES['source_file']['name'] ) );
+		$file_type           = wp_check_filetype( $sanitized_file_name );
+		if ( 'zip' !== $file_type['ext'] ) {
+			wp_send_json_error( array( 'status_save' => 'invalidfiletype' ) );
+		}
+
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Nonce validated in can_manage_icons(); temp path is validated by is_uploaded_file().
+		$tmp_file = $_FILES['source_file']['tmp_name'];
+		if ( ! is_uploaded_file( $tmp_file ) ) {
+			wp_send_json_error( array( 'status_save' => 'invalidfile' ) );
+		}
+
+		$zip = new ZipArchive();
+		$res = $zip->open( $tmp_file );
+		if ( true !== $res ) {
+			wp_send_json_error( array( 'status_save' => 'failedopen' ) );
+		}
+
+		$allowed_extensions = array( 'eot', 'svg', 'ttf', 'woff', 'woff2', 'css', 'json' );
+		$extract_dir        = $this->upload_dir . '/' . $file_name;
+		$extract_root       = realpath( $this->upload_dir );
+		if ( false === $extract_root ) {
+			$extract_root = $this->upload_dir;
+		}
+
+		if ( ! is_dir( $extract_dir ) ) {
+			wp_mkdir_p( $extract_dir );
+		}
+
+		// phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- ZipArchive uses camelCase property name.
+		for ( $i = 0; $i < $zip->numFiles; $i++ ) {
+			$stat             = $zip->statIndex( $i );
+			$file_name_in_zip = $stat['name'];
+			$file_extension   = strtolower( pathinfo( $file_name_in_zip, PATHINFO_EXTENSION ) );
+
+			if ( ! in_array( $file_extension, $allowed_extensions, true ) ) {
+				continue;
+			}
+
+			$relative_path = ltrim( str_replace( '\\', '/', $file_name_in_zip ), '/' );
+			$target_path   = $extract_dir . '/' . $relative_path;
+			$target_dir    = dirname( $target_path );
+
+			if ( ! is_dir( $target_dir ) ) {
+				wp_mkdir_p( $target_dir );
+			}
+
+			$real_target_dir = realpath( $target_dir );
+			if ( false === $real_target_dir || false === $extract_root || strpos( $real_target_dir, $extract_root ) !== 0 ) {
+				continue;
+			}
+
+			if ( ! copy( 'zip://' . $tmp_file . '#' . $file_name_in_zip, $target_path ) ) {
+				$zip->close();
+				wp_send_json_error( array( 'status_save' => 'failedextract' ) );
+			}
+
+			// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_chmod -- File extracted directly from uploaded ZIP.
+			chmod( $target_path, 0644 );
+		}
+
+		$zip->close();
+
+		if ( count( glob( $extract_dir . '/*', GLOB_NOSORT ) ) === 0 ) {
+			wp_send_json_error( array( 'status_save' => 'failedextract' ) );
+		}
+
+		$font_data = $this->get_config_font( $file_name );
+		if ( false === $font_data ) {
+			wp_send_json_error( array( 'status_save' => 'emptyfile' ) );
+		}
+
+		$icons = $this->get_icon_map_from_font_data( $font_data );
+		if ( empty( $icons ) || ! is_array( $icons ) ) {
+			wp_send_json_error( array( 'status_save' => 'emptyfile' ) );
+		}
+
+		$result                = array();
+		$result['count_icons'] = count( $icons );
+		$result['first_icon']  = ! empty( $icons ) ? key( $icons ) : '';
+		$iconlist              = '';
+		foreach ( $icons as $iconkey => $iconcode ) {
+			$iconlist .= '<div><i class="eci ' . esc_attr( $iconkey ) . '" style="font-size: 16px;"></i><span>' . esc_html( $iconkey ) . '</span></div>';
+		}
+		$result['iconlist']    = $iconlist;
+		$result['name']        = $font_data['name'];
+		$result['data']        = $font_data;
+		$result['status_save'] = $this->update_options( $font_data, '1' );
+
+		new MergeCss_ECIcons();
+
+		if ( 'updated' !== $result['status_save'] ) {
+			wp_send_json_error( $result );
+		}
+
+		wp_send_json_success( $result );
 	}
 
 	/**
@@ -216,77 +213,56 @@ class SaveFont_ECIcons extends ECIcons {
 	 * Delete ZIP file
 	 */
 	public function ec_icons_delete_font() {
-
-		if ( wp_verify_nonce( $this->getRequest( '_wpnonce' ), 'ec_icons_nonce' ) && current_user_can( 'manage_options' ) ) {
-
-			$file_name = $this->getRequest( 'file_name', 'font' );
-
-			$options = get_option( 'ec_icons_fonts' );
-
-			if ( empty( $options[ $file_name ] ) ) {
-				return false;
-			}
-
-			$data = json_decode( $options[ $file_name ]['data'], true );
-
-			// Validate and sanitize file paths.
-			$upload_dir = (string) ec_icons_manager()->upload_dir;
-			$file_path  = realpath( $upload_dir . '/' . $data['file_name'] );
-			$json_path  = realpath( $upload_dir . '/' . $data['name'] . '.json' );
-
-			// Ensure the file paths are within the upload directory.
-			if ( strpos( $file_path, $upload_dir ) !== 0 || strpos( $json_path, $upload_dir ) !== 0 ) {
-					$result = array(
-						'status_save' => 'deletefailed',
-						'message'     => 'Invalid file path',
-					);
-					echo wp_json_encode( $result );
-					die();
-			}
-
-			// remove option.
-			unset( $options[ $file_name ] );
-
-			// remove file.
-			$dir_path = ec_icons_manager()->upload_dir . '/' . str_replace( '.zip', '', $data['file_name'] );
-			if ( is_dir( $dir_path ) ) {
-				$this->rrmdir( $dir_path );
-			} elseif ( is_dir( ec_icons_manager()->upload_dir . '/' . $data['file_name'] ) ) {
-				// fallback for previous versions.
-				$this->rrmdir( ec_icons_manager()->upload_dir . '/' . $data['file_name'] );
-			}
-			wp_delete_file( ec_icons_manager()->upload_dir . '/' . $data['name'] . '.json' );
-
-			$result = array(
-				'name'        => $file_name,
-				'status_save' => 'none',
-			);
-
-			if ( update_option( 'ec_icons_fonts', $options ) ) {
-				$result['status_save'] = 'remove';
-
-				new MergeCss_ECIcons();
-			}
-
-			echo wp_json_encode( $result );
-
-		} else {
-
-			$result = array(
-				'status_save' => 'deletefailed',
-			);
-
-			echo wp_json_encode( $result );
-
+		if ( ! $this->can_manage_icons() ) {
+			wp_send_json_error( array( 'status_save' => 'deletefailed' ) );
 		}
 
-		die();
+		$file_name = $this->get_request( 'file_name', 'font' );
+		$options   = get_option( 'ec_icons_fonts' );
+		if ( empty( $options[ $file_name ] ) ) {
+			wp_send_json_error( array( 'status_save' => 'deletefailed' ) );
+		}
+
+		$data = json_decode( $options[ $file_name ]['data'], true );
+		if ( ! is_array( $data ) || empty( $data['file_name'] ) || empty( $data['name'] ) ) {
+			wp_send_json_error( array( 'status_save' => 'deletefailed' ) );
+		}
+
+		$upload_dir    = (string) ec_icons_manager()->upload_dir;
+		$real_upload   = realpath( $upload_dir );
+		$candidate_dir = realpath( $upload_dir . '/' . str_replace( '.zip', '', $data['file_name'] ) );
+		$candidate_old = realpath( $upload_dir . '/' . $data['file_name'] );
+
+		if ( $candidate_dir && $real_upload && strpos( $candidate_dir, $real_upload ) === 0 ) {
+			$this->rrmdir( $candidate_dir );
+		} elseif ( $candidate_old && $real_upload && strpos( $candidate_old, $real_upload ) === 0 ) {
+			$this->rrmdir( $candidate_old );
+		}
+
+		wp_delete_file( $upload_dir . '/' . $data['name'] . '.json' );
+		unset( $options[ $file_name ] );
+
+		$result = array(
+			'name'        => $file_name,
+			'status_save' => 'none',
+		);
+
+		if ( update_option( 'ec_icons_fonts', $options ) ) {
+			$result['status_save'] = 'remove';
+			new MergeCss_ECIcons();
+			wp_send_json_success( $result );
+		}
+
+		wp_send_json_error( array( 'status_save' => 'deletefailed' ) );
 	}
 
 	/**
 	 * Regenerate CSS file
 	 */
 	public function ec_icons_regenerate() {
+		if ( ! $this->can_manage_icons() ) {
+			wp_send_json_error( array( 'status_regen' => 'failed' ) );
+		}
 
 		$options = get_option( 'ec_icons_fonts' );
 
@@ -320,12 +296,10 @@ class SaveFont_ECIcons extends ECIcons {
 
 		new MergeCss_ECIcons();
 
-		$result                 = array();
-		$result['status_regen'] = 'regen';
-		echo wp_json_encode( $result );
-
-		die();
+		wp_send_json_success(
+			array(
+				'status_regen' => 'regen',
+			)
+		);
 	}
-
-
 }

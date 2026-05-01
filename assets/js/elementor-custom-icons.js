@@ -50,6 +50,14 @@ jQuery(document).ready(function($) {
 			} );
 		}
 
+		function normalizeResponse( response ) {
+			if ( response && typeof response === 'object' && Object.prototype.hasOwnProperty.call( response, 'success' ) ) {
+				return response.data || {};
+			}
+
+			return response || {};
+		}
+
 		/* New Font */
 		$( '#ec-icons-files' ).on( 'change', function( evt ) {
 
@@ -72,54 +80,58 @@ jQuery(document).ready(function($) {
 
 					request.append( "file_name", file_name );
 					request.append( "source_file", theFile, file_name );
-					request.append( "eci_action", "ec_icons_save_font" );
+					request.append( "action", EC_ICONS.saveAction );
 					request.append( "_wpnonce", $( '.ec-icons-drop' ).find( '#_wpnonce' ).val() );
 
 					ajaxSend( request, function( response ) {
+						var data = normalizeResponse( response );
 
-						if ( response.status_save === 'updated' ) {
+						if ( data.status_save === 'updated' ) {
 
 							var $el = $( '.ec-icons-clone' ).clone();
-							$el.find( '.eci-extension-title' ).text( response.name );
-							$el.find( '.eci-extension-info-details .value' ).text( response.count_icons );
-							$el.find( '.eci' ).addClass( response.first_icon );
-							$el.find( '.iconlist' ).html( response.iconlist );
+							$el.find( '.eci-extension-title' ).text( data.name );
+							$el.find( '.eci-extension-info-details .value' ).text( data.count_icons );
+							$el.find( '.eci' ).addClass( data.first_icon );
+							$el.find( '.iconlist' ).html( data.iconlist );
 
 							$( '.wrapper-list-fonts' )
 								.removeClass( 'hidden' )
 								.find( '.eci-extensions' ).append( $el[ 0 ] );
 
-							$el.show().find( '.delete-font' ).attr( 'data-font', JSON.stringify( response.data ) );
+							$el.show().find( '.delete-font' ).attr( 'data-font', JSON.stringify( data.data ) );
 
 							reloadCss();
 
 						}
-						else if ( response.status_save === 'exist' ) {
+						else if ( data.status_save === 'exist' ) {
 							alert( EC_ICONS.exist );
 						} 
-						else if ( response.status_save === 'failedopen' ) {
+						else if ( data.status_save === 'failedopen' ) {
 							alert( EC_ICONS.failedopen );
 						} 
-						else if ( response.status_save === 'failedextract' ) {
+						else if ( data.status_save === 'failedextract' ) {
 							alert( EC_ICONS.failedextract );
 						} 
-						else if ( response.status_save === 'emptyfile' ) {
+						else if ( data.status_save === 'emptyfile' ) {
 							alert( EC_ICONS.emptyfile );
 						}
-						else if ( response.status_save === 'updatefailed' ) {
+						else if ( data.status_save === 'updatefailed' ) {
 							alert( EC_ICONS.updatefailed );
 						}
-						else if ( response.status_save === 'invalidfiletype' ) {
+						else if ( data.status_save === 'invalidfiletype' ) {
 							alert( EC_ICONS.invalidfiletype );
 						}
-						else if ( response.status_save === 'invalidfile' ) {
+						else if ( data.status_save === 'invalidfile' ) {
 							alert( EC_ICONS.invalidfiletype );
 						}
-						else if ( response.status_save === 'deletefailed' ) {
+						else if ( data.status_save === 'deletefailed' ) {
 							alert( EC_ICONS.deletefailed );
 						}
-						else if ( response.status_save === 'remove' ) {
+						else if ( data.status_save === 'remove' ) {
 							alert( EC_ICONS.remove );
+						}
+						else {
+							alert( EC_ICONS.unknownerror );
 						}
 
 						progress_bar( 0, 5 );
@@ -147,12 +159,13 @@ jQuery(document).ready(function($) {
 				data = $this.data( 'font' );
 
 				request.append( "file_name", data.name );
-				request.append( "eci_action", "ec_icons_delete_font" );
+				request.append( "action", EC_ICONS.deleteAction );
 				request.append( "_wpnonce", $( '.ec-icons-drop' ).find( '#_wpnonce' ).val() );
 
 				ajaxSend( request, function( response, context ) {
+					var data = normalizeResponse( response );
 
-					if ( response.status_save === 'remove' ) {
+					if ( data.status_save === 'remove' ) {
 
 						var $item = $( context ).closest( '.eci-extension' );
 						$item.css( {
@@ -172,7 +185,7 @@ jQuery(document).ready(function($) {
 						}, 1500 );
 
 					} else {
-						alert('fail');
+						alert( EC_ICONS.deletefailed );
 					}
 
 				}, this );
@@ -187,14 +200,16 @@ jQuery(document).ready(function($) {
 			e.preventDefault();
 
 			var request = new FormData();
-			request.append( "eci_action", "ec_icons_regenerate" );
+			request.append( "action", EC_ICONS.regenAction );
+			request.append( "_wpnonce", $( '.ec-icons-drop' ).find( '#_wpnonce' ).val() );
 
 			ajaxSend( request, function(response) {
+				var data = normalizeResponse( response );
 
-				if ( response.status_regen === 'regen' ) {
+				if ( data.status_regen === 'regen' ) {
 					alert(EC_ICONS.regen);
 				} else {
-					alert("Unknown error...");
+					alert( EC_ICONS.unknownerror );
 				}
 
 			} );

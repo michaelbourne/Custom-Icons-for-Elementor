@@ -49,6 +49,8 @@ class MergeCss_ECIcons extends ECIcons {
             -moz-osx-font-smoothing: grayscale;
      	}
      	.select2-container i.eci,
+     	.elementor-control-media i.eci,
+     	.elementor-button i.eci,
      	.elementor-icon-list-icon i.eci {
      	  display: inline-block;
      	}
@@ -72,7 +74,7 @@ class MergeCss_ECIcons extends ECIcons {
 
 				$font_data = json_decode( $font['data'], true );
 
-				if ( isset( $font_data['nameempty'] ) && true == $font_data['nameempty'] ) {
+				if ( isset( $font_data['nameempty'] ) && true === $font_data['nameempty'] ) {
 					$fontfilename = 'fontello';
 				} else {
 					$fontfilename = strtolower( $font_data['name'] );
@@ -91,7 +93,7 @@ class MergeCss_ECIcons extends ECIcons {
 						  font-style: normal;
 						}\n";
 
-				$icons = $this->parse_css( $font_data['css_root'], $font_data['name'], $font_data['css_url'] );
+				$icons = $this->get_icon_map_from_font_data( $font_data );
 
 				if ( ! empty( $icons ) && is_array( $icons ) ) {
 
@@ -115,10 +117,6 @@ class MergeCss_ECIcons extends ECIcons {
 			WP_Filesystem();
 			$wp_filesystem->put_contents( ec_icons_manager()->upload_dir . '/merged-icons-font.css', $css_content );
 			update_option( 'eci_css_timestamp', time(), true );
-		} else {
-			if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
-				error_log( 'Error saving Fontello CSS file to: ' . ec_icons_manager()->upload_dir );
-			}
 		}
 	}
 
@@ -141,14 +139,11 @@ class MergeCss_ECIcons extends ECIcons {
 				}
 
 				$font_data = json_decode( $font['data'], true );
+				$json      = array( 'icons' => array() );
 
-				$icons = $this->parse_css( $font_data['css_root'], $font_data['name'], $font_data['css_url'] );
+				$icons = $this->get_icon_map_from_font_data( $font_data );
 
 				if ( ! empty( $icons ) && is_array( $icons ) ) {
-
-					$json          = array();
-					$json['icons'] = array();
-
 					foreach ( $icons as $name_icon => $code ) {
 						$json['icons'][] = $name_icon;
 
