@@ -13,7 +13,7 @@ Enables the user to add their own custom icons to the built in Elementor icon co
 
 Please note, this plugin requires the Elementor Page Builder to be installed and active. [Elementor is a free plugin](https://en-ca.wordpress.org/plugins/elementor/).
 
-This plugin relies on a third party service for it's functionality provided by [Fontello](http://fontello.com). No private information is sent to their server, rather their provided webfont downloads are what's used to add fonts to this plugin.
+This plugin relies on a third party service for its functionality provided by [Fontello](https://fontello.com). No private information is sent to their server, rather their provided webfont downloads are what's used to add fonts to this plugin.
 
 Looking for a video tutorial? [Here it is!](https://youtu.be/Rnu9XVD8AdI)
 
@@ -40,6 +40,13 @@ There is a small, small chance this plugin may not work on your web host. This i
 ---
 
 ### Changelog
+
+**1.0.0**
+* Added compatibility improvements for WordPress 6.9 and newer Elementor icon control flows.
+* Switched AJAX requests to standard namespaced WordPress `action` handlers.
+* Hardened all icon write endpoints with nonce and capability checks.
+* Improved Fontello archive parsing and config validation.
+* Updated frontend/editor stylesheet enqueue behavior and metadata.
 
 **0.3.1**
 * Small fix for Elementor 2.6
