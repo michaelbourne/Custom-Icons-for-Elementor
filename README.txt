@@ -3,8 +3,9 @@ Contributors: michaelbourne
 Donate link: https://www.paypal.me/yycpro
 Tags: elementor, icons, fontello, icon fonts
 Requires at least: 5.4
-Tested up to: 6.6.2
-Stable tag: 0.3.4
+Tested up to: 6.9
+Requires PHP: 7.4
+Stable tag: 1.0.0
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.en.html
 
@@ -22,7 +23,7 @@ Enables the user to add their own custom icons to the built in Elementor icon co
 
 Please note, this plugin requires the Elementor Page Builder to be installed and active. [Elementor is a free plugin](https://en-ca.wordpress.org/plugins/elementor/).
 
-This plugin relies on a third party service for it's functionality provided by [Fontello](http://fontello.com). No private information is sent to their server, rather their provided webfont downloads are what's used to add fonts to this plugin.
+This plugin relies on a third party service for its functionality provided by [Fontello](https://fontello.com). No private information is sent to their server, rather their provided webfont downloads are what's used to add fonts to this plugin.
 
 Looking for a video tutorial? [Here it is!](https://youtu.be/Rnu9XVD8AdI)
 
@@ -62,6 +63,13 @@ Removing this plugin will render your custom icons to be deleted. Take care to u
 None yet
 
 == Changelog ==
+
+= 1.0.0 =
+* Compatibility: Improved support for WordPress 6.9 and newer Elementor icon control flows.
+* Security: Hardened AJAX endpoints with standard WordPress action routing, nonce validation, and capability checks.
+* Importer: Improved Fontello package parsing and config validation for broader archive compatibility.
+* Reliability: Updated style enqueue behavior for frontend/editor contexts and removed non-core enqueue dependency.
+* Maintenance: Version metadata and admin links refreshed.
 
 = 0.3.4 =
 * Fix: further restrict file uploads to parse out unused files.
